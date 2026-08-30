@@ -1,0 +1,28 @@
+{
+  "shadow": {
+    "sm": {
+      "$value": "rgba(0, 0, 0, 0.2) 0px 4px 15px 0px",
+      "$type": "shadow",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 102,
+          "pageSpread": 15,
+          "normScore": 10.9317,
+          "raw": true
+        }
+      }
+    },
+    "md": {
+      "$value": "rgba(0, 0, 0, 0.1) 0px 4px 20px 0px",
+      "$type": "shadow",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 15,
+          "pageSpread": 15,
+          "normScore": 3.5683,
+          "raw": true
+        }
+      }
+    }
+  }
+}

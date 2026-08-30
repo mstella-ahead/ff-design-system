@@ -1,0 +1,798 @@
+{
+  "fontFamily": {
+    "proxima-nova": {
+      "$value": "\"Proxima Nova\"",
+      "$type": "fontFamily",
+      "$description": "Primary UI font stack",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 7036,
+          "pageSpread": 15,
+          "pageSpreadPct": 100,
+          "normScore": 14.5257
+        }
+      }
+    }
+  },
+  "fontSize": {
+    "sm": {
+      "$value": "14px",
+      "$type": "dimension",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 458,
+          "pageSpread": 15,
+          "pageSpreadPct": 100,
+          "normScore": 1.8617,
+          "px": 14
+        }
+      }
+    },
+    "base": {
+      "$value": "16px",
+      "$type": "dimension",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 3156,
+          "pageSpread": 15,
+          "pageSpreadPct": 100,
+          "normScore": 8.8883,
+          "px": 16
+        }
+      }
+    },
+    "lg": {
+      "$value": "18px",
+      "$type": "dimension",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 3116,
+          "pageSpread": 15,
+          "pageSpreadPct": 100,
+          "normScore": 3.4621,
+          "px": 18
+        }
+      }
+    },
+    "xl": {
+      "$value": "19px",
+      "$type": "dimension",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 91,
+          "pageSpread": 3,
+          "pageSpreadPct": 20,
+          "normScore": 0.2139,
+          "px": 19
+        }
+      }
+    },
+    "2xl": {
+      "$value": "20px",
+      "$type": "dimension",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 9,
+          "pageSpread": 3,
+          "pageSpreadPct": 20,
+          "normScore": 0.0297,
+          "px": 20
+        }
+      }
+    },
+    "3xl": {
+      "$value": "21px",
+      "$type": "dimension",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 2,
+          "pageSpread": 1,
+          "pageSpreadPct": 6.7,
+          "normScore": 0.0077,
+          "px": 21
+        }
+      }
+    },
+    "4xl": {
+      "$value": "25px",
+      "$type": "dimension",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 25,
+          "pageSpread": 5,
+          "pageSpreadPct": 33.3,
+          "normScore": 0.0981,
+          "px": 25
+        }
+      }
+    },
+    "5xl": {
+      "$value": "26px",
+      "$type": "dimension",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 8,
+          "pageSpread": 7,
+          "pageSpreadPct": 46.7,
+          "normScore": 0.0354,
+          "px": 26
+        }
+      }
+    },
+    "6xl": {
+      "$value": "28px",
+      "$type": "dimension",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 3,
+          "pageSpread": 1,
+          "pageSpreadPct": 6.7,
+          "normScore": 0.0119,
+          "px": 28
+        }
+      }
+    },
+    "7xl": {
+      "$value": "30px",
+      "$type": "dimension",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 224,
+          "pageSpread": 9,
+          "pageSpreadPct": 60,
+          "normScore": 0.1993,
+          "px": 30
+        }
+      }
+    },
+    "size-38": {
+      "$value": "38px",
+      "$type": "dimension",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 1,
+          "pageSpread": 1,
+          "pageSpreadPct": 6.7,
+          "normScore": 0.0044,
+          "px": 38
+        }
+      }
+    },
+    "size-45": {
+      "$value": "45px",
+      "$type": "dimension",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 38,
+          "pageSpread": 6,
+          "pageSpreadPct": 40,
+          "normScore": 0.1303,
+          "px": 45
+        }
+      }
+    },
+    "size-67": {
+      "$value": "67px",
+      "$type": "dimension",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 14,
+          "pageSpread": 13,
+          "pageSpreadPct": 86.7,
+          "normScore": 0.0571,
+          "px": 67
+        }
+      }
+    }
+  },
+  "fontWeight": {
+    "regular": {
+      "$value": 400,
+      "$type": "fontWeight",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 6395,
+          "pageSpread": 15,
+          "pageSpreadPct": 100,
+          "normScore": 11.9684
+        }
+      }
+    },
+    "black": {
+      "$value": 900,
+      "$type": "fontWeight",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 300,
+          "pageSpread": 15,
+          "pageSpreadPct": 100,
+          "normScore": 1.2336
+        }
+      }
+    },
+    "bold": {
+      "$value": 700,
+      "$type": "fontWeight",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 246,
+          "pageSpread": 15,
+          "pageSpreadPct": 100,
+          "normScore": 0.9709
+        }
+      }
+    },
+    "semibold": {
+      "$value": 600,
+      "$type": "fontWeight",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 195,
+          "pageSpread": 15,
+          "pageSpreadPct": 100,
+          "normScore": 0.8019
+        }
+      }
+    },
+    "extrabold": {
+      "$value": 800,
+      "$type": "fontWeight",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 9,
+          "pageSpread": 1,
+          "pageSpreadPct": 6.7,
+          "normScore": 0.0252
+        }
+      }
+    }
+  },
+  "lineHeight": {
+    "lh-0": {
+      "$value": "14px",
+      "$type": "dimension",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 390,
+          "pageSpread": 15,
+          "pageSpreadPct": 100,
+          "normScore": 1.6253,
+          "px": 14
+        }
+      }
+    },
+    "lh-1": {
+      "$value": "16px",
+      "$type": "dimension",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 416,
+          "pageSpread": 15,
+          "pageSpreadPct": 100,
+          "normScore": 1.6825,
+          "px": 16
+        }
+      }
+    },
+    "lh-2": {
+      "$value": "18px",
+      "$type": "dimension",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 103,
+          "pageSpread": 15,
+          "pageSpreadPct": 100,
+          "normScore": 0.4263,
+          "px": 18
+        }
+      }
+    },
+    "lh-3": {
+      "$value": "20px",
+      "$type": "dimension",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 27,
+          "pageSpread": 4,
+          "pageSpreadPct": 26.7,
+          "normScore": 0.0804,
+          "px": 20
+        }
+      }
+    },
+    "lh-4": {
+      "$value": "22px",
+      "$type": "dimension",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 45,
+          "pageSpread": 15,
+          "pageSpreadPct": 100,
+          "normScore": 0.1875,
+          "px": 22
+        }
+      }
+    },
+    "lh-5": {
+      "$value": "23px",
+      "$type": "dimension",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 15,
+          "pageSpread": 1,
+          "pageSpreadPct": 6.7,
+          "normScore": 0.0682,
+          "px": 23
+        }
+      }
+    },
+    "lh-6": {
+      "$value": "24px",
+      "$type": "dimension",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 5507,
+          "pageSpread": 15,
+          "pageSpreadPct": 100,
+          "normScore": 9.2818,
+          "px": 24
+        }
+      }
+    },
+    "lh-7": {
+      "$value": "25px",
+      "$type": "dimension",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 6,
+          "pageSpread": 2,
+          "pageSpreadPct": 13.3,
+          "normScore": 0.0252,
+          "px": 25
+        }
+      }
+    },
+    "lh-8": {
+      "$value": "26px",
+      "$type": "dimension",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 164,
+          "pageSpread": 15,
+          "pageSpreadPct": 100,
+          "normScore": 0.7223,
+          "px": 26
+        }
+      }
+    },
+    "lh-9": {
+      "$value": "27px",
+      "$type": "dimension",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 126,
+          "pageSpread": 5,
+          "pageSpreadPct": 33.3,
+          "normScore": 0.3651,
+          "px": 27
+        }
+      }
+    },
+    "lh-10": {
+      "$value": "30px",
+      "$type": "dimension",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 229,
+          "pageSpread": 10,
+          "pageSpreadPct": 66.7,
+          "normScore": 0.2122,
+          "px": 30
+        }
+      }
+    },
+    "lh-11": {
+      "$value": "35px",
+      "$type": "dimension",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 19,
+          "pageSpread": 5,
+          "pageSpreadPct": 33.3,
+          "normScore": 0.0817,
+          "px": 35
+        }
+      }
+    },
+    "lh-12": {
+      "$value": "36px",
+      "$type": "dimension",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 8,
+          "pageSpread": 7,
+          "pageSpreadPct": 46.7,
+          "normScore": 0.0361,
+          "px": 36
+        }
+      }
+    },
+    "lh-13": {
+      "$value": "45px",
+      "$type": "dimension",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 3,
+          "pageSpread": 1,
+          "pageSpreadPct": 6.7,
+          "normScore": 0.0122,
+          "px": 45
+        }
+      }
+    },
+    "lh-14": {
+      "$value": "50px",
+      "$type": "dimension",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 38,
+          "pageSpread": 6,
+          "pageSpreadPct": 40,
+          "normScore": 0.1308,
+          "px": 50
+        }
+      }
+    },
+    "lh-15": {
+      "$value": "75px",
+      "$type": "dimension",
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 15,
+          "pageSpread": 14,
+          "pageSpreadPct": 93.3,
+          "normScore": 0.0623,
+          "px": 75
+        }
+      }
+    }
+  },
+  "textStyle": {
+    "body": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "\"Proxima Nova\"",
+        "fontSize": "16px",
+        "fontWeight": 400,
+        "lineHeight": "24px",
+        "letterSpacing": "normal"
+      },
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 2543,
+          "pageSpread": 15,
+          "pageSpreadPct": 100,
+          "normScore": 6.4616,
+          "pages": [
+            "applications-case-studies",
+            "blog",
+            "blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever",
+            "company-about-us",
+            "company-careers-career-opportunities",
+            "company-news-events-press-releases",
+            "events",
+            "home",
+            "industries-automotive",
+            "press-release-formfactor-introduces-the-evolvity-300-probe-system",
+            "product-probe-cards-foundry-logic-apollo",
+            "products",
+            "products-probe-cards",
+            "sales-service-contact-sales",
+            "technologies-contact-intelligence"
+          ]
+        }
+      }
+    },
+    "lg-regular": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "\"Proxima Nova\"",
+        "fontSize": "18px",
+        "fontWeight": 400,
+        "lineHeight": "24.464px",
+        "letterSpacing": "-0.176px"
+      },
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 2785,
+          "pageSpread": 13,
+          "pageSpreadPct": 86.7,
+          "normScore": 2.0487,
+          "pages": [
+            "applications-case-studies",
+            "blog",
+            "blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever",
+            "company-careers-career-opportunities",
+            "company-news-events-press-releases",
+            "home",
+            "industries-automotive",
+            "press-release-formfactor-introduces-the-evolvity-300-probe-system",
+            "product-probe-cards-foundry-logic-apollo",
+            "products",
+            "products-probe-cards",
+            "sales-service-contact-sales",
+            "technologies-contact-intelligence"
+          ]
+        }
+      }
+    },
+    "sm-regular": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "\"Proxima Nova\"",
+        "fontSize": "14px",
+        "fontWeight": 400,
+        "lineHeight": "14.4px",
+        "letterSpacing": "normal"
+      },
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 390,
+          "pageSpread": 15,
+          "pageSpreadPct": 100,
+          "normScore": 1.6037,
+          "pages": [
+            "applications-case-studies",
+            "blog",
+            "blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever",
+            "company-about-us",
+            "company-careers-career-opportunities",
+            "company-news-events-press-releases",
+            "events",
+            "home",
+            "industries-automotive",
+            "press-release-formfactor-introduces-the-evolvity-300-probe-system",
+            "product-probe-cards-foundry-logic-apollo",
+            "products",
+            "products-probe-cards",
+            "sales-service-contact-sales",
+            "technologies-contact-intelligence"
+          ]
+        }
+      }
+    },
+    "base-black": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "\"Proxima Nova\"",
+        "fontSize": "16px",
+        "fontWeight": 900,
+        "lineHeight": "16px",
+        "letterSpacing": "normal"
+      },
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 300,
+          "pageSpread": 15,
+          "pageSpreadPct": 100,
+          "normScore": 1.2336,
+          "pages": [
+            "applications-case-studies",
+            "blog",
+            "blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever",
+            "company-about-us",
+            "company-careers-career-opportunities",
+            "company-news-events-press-releases",
+            "events",
+            "home",
+            "industries-automotive",
+            "press-release-formfactor-introduces-the-evolvity-300-probe-system",
+            "product-probe-cards-foundry-logic-apollo",
+            "products",
+            "products-probe-cards",
+            "sales-service-contact-sales",
+            "technologies-contact-intelligence"
+          ]
+        }
+      }
+    },
+    "base-bold": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "\"Proxima Nova\"",
+        "fontSize": "16px",
+        "fontWeight": 700,
+        "lineHeight": "24px",
+        "letterSpacing": "normal"
+      },
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 127,
+          "pageSpread": 15,
+          "pageSpreadPct": 100,
+          "normScore": 0.4481,
+          "pages": [
+            "applications-case-studies",
+            "blog",
+            "blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever",
+            "company-about-us",
+            "company-careers-career-opportunities",
+            "company-news-events-press-releases",
+            "events",
+            "home",
+            "industries-automotive",
+            "press-release-formfactor-introduces-the-evolvity-300-probe-system",
+            "product-probe-cards-foundry-logic-apollo",
+            "products",
+            "products-probe-cards",
+            "sales-service-contact-sales",
+            "technologies-contact-intelligence"
+          ]
+        }
+      }
+    },
+    "lg-semibold": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "\"Proxima Nova\"",
+        "fontSize": "18px",
+        "fontWeight": 600,
+        "lineHeight": "17.6px",
+        "letterSpacing": "normal"
+      },
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 90,
+          "pageSpread": 15,
+          "pageSpreadPct": 100,
+          "normScore": 0.3701,
+          "pages": [
+            "applications-case-studies",
+            "blog",
+            "blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever",
+            "company-about-us",
+            "company-careers-career-opportunities",
+            "company-news-events-press-releases",
+            "events",
+            "home",
+            "industries-automotive",
+            "press-release-formfactor-introduces-the-evolvity-300-probe-system",
+            "product-probe-cards-foundry-logic-apollo",
+            "products",
+            "products-probe-cards",
+            "sales-service-contact-sales",
+            "technologies-contact-intelligence"
+          ]
+        }
+      }
+    },
+    "base-semibold": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "\"Proxima Nova\"",
+        "fontSize": "16px",
+        "fontWeight": 600,
+        "lineHeight": "16px",
+        "letterSpacing": "normal"
+      },
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 75,
+          "pageSpread": 15,
+          "pageSpreadPct": 100,
+          "normScore": 0.3084,
+          "pages": [
+            "applications-case-studies",
+            "blog",
+            "blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever",
+            "company-about-us",
+            "company-careers-career-opportunities",
+            "company-news-events-press-releases",
+            "events",
+            "home",
+            "industries-automotive",
+            "press-release-formfactor-introduces-the-evolvity-300-probe-system",
+            "product-probe-cards-foundry-logic-apollo",
+            "products",
+            "products-probe-cards",
+            "sales-service-contact-sales",
+            "technologies-contact-intelligence"
+          ]
+        }
+      }
+    },
+    "lg-bold": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "\"Proxima Nova\"",
+        "fontSize": "18px",
+        "fontWeight": 700,
+        "lineHeight": "25.52px",
+        "letterSpacing": "normal"
+      },
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 63,
+          "pageSpread": 15,
+          "pageSpreadPct": 100,
+          "normScore": 0.2753,
+          "pages": [
+            "applications-case-studies",
+            "blog",
+            "blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever",
+            "company-about-us",
+            "company-careers-career-opportunities",
+            "company-news-events-press-releases",
+            "events",
+            "home",
+            "industries-automotive",
+            "press-release-formfactor-introduces-the-evolvity-300-probe-system",
+            "product-probe-cards-foundry-logic-apollo",
+            "products",
+            "products-probe-cards",
+            "sales-service-contact-sales",
+            "technologies-contact-intelligence"
+          ]
+        }
+      }
+    },
+    "xl-regular": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "\"Proxima Nova\"",
+        "fontSize": "19px",
+        "fontWeight": 400,
+        "lineHeight": "26.688px",
+        "letterSpacing": "normal"
+      },
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 91,
+          "pageSpread": 3,
+          "pageSpreadPct": 20,
+          "normScore": 0.2139,
+          "pages": [
+            "blog",
+            "blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever",
+            "technologies-contact-intelligence"
+          ]
+        }
+      }
+    },
+    "lg-regular-2": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "\"Proxima Nova\"",
+        "fontSize": "18px",
+        "fontWeight": 400,
+        "lineHeight": "25.52px",
+        "letterSpacing": "normal"
+      },
+      "$extensions": {
+        "com.formfactor.www": {
+          "count": 51,
+          "pageSpread": 15,
+          "pageSpreadPct": 100,
+          "normScore": 0.1978,
+          "pages": [
+            "applications-case-studies",
+            "blog",
+            "blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever",
+            "company-about-us",
+            "company-careers-career-opportunities",
+            "company-news-events-press-releases",
+            "events",
+            "home",
+            "industries-automotive",
+            "press-release-formfactor-introduces-the-evolvity-300-probe-system",
+            "product-probe-cards-foundry-logic-apollo",
+            "products",
+            "products-probe-cards",
+            "sales-service-contact-sales",
+            "technologies-contact-intelligence"
+          ]
+        }
+      }
+    }
+  }
+}

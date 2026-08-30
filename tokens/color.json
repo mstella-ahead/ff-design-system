@@ -1,0 +1,691 @@
+{
+  "color": {
+    "theme": {
+      "dark-grey": {
+        "$value": "#6f6a67",
+        "$type": "color",
+        "$description": "FormFactor theme color `--dark-grey`",
+        "$extensions": {
+          "com.formfactor.www": {
+            "tier": "core",
+            "authoredVar": "--dark-grey",
+            "generatedName": "neutral-600",
+            "count": 4113,
+            "pageSpread": 15,
+            "pageSpreadPct": 100,
+            "normScore": 6.6002,
+            "roles": {
+              "text": 4055,
+              "bg": 9,
+              "border": 49
+            },
+            "oklch": {
+              "l": 0.528,
+              "c": 0.008,
+              "h": 53.3
+            },
+            "clusterMembers": [
+              {
+                "hex": "#6f6a67",
+                "count": 4113
+              }
+            ],
+            "pages": [
+              "applications-case-studies",
+              "blog",
+              "blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever",
+              "company-about-us",
+              "company-careers-career-opportunities",
+              "company-news-events-press-releases",
+              "events",
+              "home",
+              "industries-automotive",
+              "press-release-formfactor-introduces-the-evolvity-300-probe-system",
+              "product-probe-cards-foundry-logic-apollo",
+              "products",
+              "products-probe-cards",
+              "sales-service-contact-sales",
+              "technologies-contact-intelligence"
+            ]
+          }
+        }
+      },
+      "light": {
+        "$value": "#ffffff",
+        "$type": "color",
+        "$description": "FormFactor theme color `--light`",
+        "$extensions": {
+          "com.formfactor.www": {
+            "tier": "core",
+            "authoredVar": "--light",
+            "generatedName": "neutral-white",
+            "count": 1002,
+            "pageSpread": 15,
+            "pageSpreadPct": 100,
+            "normScore": 3.5728,
+            "roles": {
+              "text": 905,
+              "bg": 57,
+              "border": 40
+            },
+            "oklch": {
+              "l": 1,
+              "c": 0,
+              "h": 0
+            },
+            "clusterMembers": [
+              {
+                "hex": "#ffffff",
+                "count": 1002
+              }
+            ],
+            "pages": [
+              "applications-case-studies",
+              "blog",
+              "blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever",
+              "company-about-us",
+              "company-careers-career-opportunities",
+              "company-news-events-press-releases",
+              "events",
+              "home",
+              "industries-automotive",
+              "press-release-formfactor-introduces-the-evolvity-300-probe-system",
+              "product-probe-cards-foundry-logic-apollo",
+              "products",
+              "products-probe-cards",
+              "sales-service-contact-sales",
+              "technologies-contact-intelligence"
+            ]
+          }
+        }
+      },
+      "primary": {
+        "$value": "#003a63",
+        "$type": "color",
+        "$description": "FormFactor theme color `--primary`",
+        "$extensions": {
+          "com.formfactor.www": {
+            "tier": "core",
+            "authoredVar": "--primary",
+            "generatedName": "blue-800",
+            "count": 1855,
+            "pageSpread": 15,
+            "pageSpreadPct": 100,
+            "normScore": 3.4603,
+            "roles": {
+              "text": 1764,
+              "bg": 91,
+              "border": 0
+            },
+            "oklch": {
+              "l": 0.339,
+              "c": 0.09,
+              "h": 247.2
+            },
+            "clusterMembers": [
+              {
+                "hex": "#003a63",
+                "count": 1855
+              }
+            ],
+            "pages": [
+              "applications-case-studies",
+              "blog",
+              "blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever",
+              "company-about-us",
+              "company-careers-career-opportunities",
+              "company-news-events-press-releases",
+              "events",
+              "home",
+              "industries-automotive",
+              "press-release-formfactor-introduces-the-evolvity-300-probe-system",
+              "product-probe-cards-foundry-logic-apollo",
+              "products",
+              "products-probe-cards",
+              "sales-service-contact-sales",
+              "technologies-contact-intelligence"
+            ]
+          }
+        }
+      },
+      "grey-secondary": {
+        "$value": "#9c968d",
+        "$type": "color",
+        "$description": "FormFactor theme color `--grey-secondary`",
+        "$extensions": {
+          "com.formfactor.www": {
+            "tier": "core",
+            "authoredVar": "--grey-secondary",
+            "generatedName": "neutral-500",
+            "count": 197,
+            "pageSpread": 15,
+            "pageSpreadPct": 100,
+            "normScore": 0.6486,
+            "roles": {
+              "text": 69,
+              "bg": 0,
+              "border": 128
+            },
+            "oklch": {
+              "l": 0.676,
+              "c": 0.015,
+              "h": 78.2
+            },
+            "clusterMembers": [
+              {
+                "hex": "#9c968d",
+                "count": 197
+              }
+            ],
+            "pages": [
+              "applications-case-studies",
+              "blog",
+              "blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever",
+              "company-about-us",
+              "company-careers-career-opportunities",
+              "company-news-events-press-releases",
+              "events",
+              "home",
+              "industries-automotive",
+              "press-release-formfactor-introduces-the-evolvity-300-probe-system",
+              "product-probe-cards-foundry-logic-apollo",
+              "products",
+              "products-probe-cards",
+              "sales-service-contact-sales",
+              "technologies-contact-intelligence"
+            ]
+          }
+        }
+      },
+      "secondary": {
+        "$value": "#00a0af",
+        "$type": "color",
+        "$description": "FormFactor theme color `--secondary`",
+        "$extensions": {
+          "com.formfactor.www": {
+            "tier": "core",
+            "authoredVar": "--secondary",
+            "generatedName": "teal-500",
+            "count": 115,
+            "pageSpread": 15,
+            "pageSpreadPct": 100,
+            "normScore": 0.3141,
+            "roles": {
+              "text": 115,
+              "bg": 0,
+              "border": 0
+            },
+            "oklch": {
+              "l": 0.645,
+              "c": 0.11,
+              "h": 206.5
+            },
+            "clusterMembers": [
+              {
+                "hex": "#00a0af",
+                "count": 115
+              }
+            ],
+            "pages": [
+              "applications-case-studies",
+              "blog",
+              "blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever",
+              "company-about-us",
+              "company-careers-career-opportunities",
+              "company-news-events-press-releases",
+              "events",
+              "home",
+              "industries-automotive",
+              "press-release-formfactor-introduces-the-evolvity-300-probe-system",
+              "product-probe-cards-foundry-logic-apollo",
+              "products",
+              "products-probe-cards",
+              "sales-service-contact-sales",
+              "technologies-contact-intelligence"
+            ]
+          }
+        }
+      },
+      "dark": {
+        "$value": "#003154",
+        "$type": "color",
+        "$description": "FormFactor theme color `--dark`",
+        "$extensions": {
+          "com.formfactor.www": {
+            "tier": "core",
+            "authoredVar": "--dark",
+            "generatedName": "blue-800-2",
+            "count": 30,
+            "pageSpread": 15,
+            "pageSpreadPct": 100,
+            "normScore": 0.1159,
+            "roles": {
+              "text": 0,
+              "bg": 30,
+              "border": 0
+            },
+            "oklch": {
+              "l": 0.304,
+              "c": 0.079,
+              "h": 246.6
+            },
+            "clusterMembers": [
+              {
+                "hex": "#003154",
+                "count": 30
+              }
+            ],
+            "pages": [
+              "applications-case-studies",
+              "blog",
+              "blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever",
+              "company-about-us",
+              "company-careers-career-opportunities",
+              "company-news-events-press-releases",
+              "events",
+              "home",
+              "industries-automotive",
+              "press-release-formfactor-introduces-the-evolvity-300-probe-system",
+              "product-probe-cards-foundry-logic-apollo",
+              "products",
+              "products-probe-cards",
+              "sales-service-contact-sales",
+              "technologies-contact-intelligence"
+            ]
+          }
+        }
+      },
+      "yellow": {
+        "$value": "#d2d755",
+        "$type": "color",
+        "$description": "FormFactor theme color `--yellow`",
+        "$extensions": {
+          "com.formfactor.www": {
+            "tier": "core",
+            "authoredVar": "--yellow",
+            "generatedName": "green-200",
+            "count": 15,
+            "pageSpread": 15,
+            "pageSpreadPct": 100,
+            "normScore": 0.058,
+            "roles": {
+              "text": 15,
+              "bg": 0,
+              "border": 0
+            },
+            "oklch": {
+              "l": 0.851,
+              "c": 0.151,
+              "h": 111.3
+            },
+            "clusterMembers": [
+              {
+                "hex": "#d2d755",
+                "count": 15
+              }
+            ],
+            "pages": [
+              "applications-case-studies",
+              "blog",
+              "blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever",
+              "company-about-us",
+              "company-careers-career-opportunities",
+              "company-news-events-press-releases",
+              "events",
+              "home",
+              "industries-automotive",
+              "press-release-formfactor-introduces-the-evolvity-300-probe-system",
+              "product-probe-cards-foundry-logic-apollo",
+              "products",
+              "products-probe-cards",
+              "sales-service-contact-sales",
+              "technologies-contact-intelligence"
+            ]
+          }
+        }
+      },
+      "grey": {
+        "$value": "#e1e1e1",
+        "$type": "color",
+        "$description": "FormFactor theme color `--grey`",
+        "$extensions": {
+          "com.formfactor.www": {
+            "tier": "extended",
+            "authoredVar": "--grey",
+            "generatedName": "neutral-200",
+            "count": 6,
+            "pageSpread": 2,
+            "pageSpreadPct": 13.3,
+            "normScore": 0.0156,
+            "roles": {
+              "text": 0,
+              "bg": 0,
+              "border": 6
+            },
+            "oklch": {
+              "l": 0.91,
+              "c": 0,
+              "h": 0
+            },
+            "clusterMembers": [
+              {
+                "hex": "#e1e1e1",
+                "count": 3
+              },
+              {
+                "hex": "#e8e8e8",
+                "count": 3
+              }
+            ],
+            "pages": [
+              "industries-automotive",
+              "sales-service-contact-sales"
+            ]
+          }
+        }
+      }
+    },
+    "palette": {
+      "neutral": {
+        "300": {
+          "$value": "#cccccc",
+          "$type": "color",
+          "$extensions": {
+            "com.formfactor.www": {
+              "tier": "extended",
+              "authoredVar": null,
+              "generatedName": "neutral-300",
+              "count": 13,
+              "pageSpread": 2,
+              "pageSpreadPct": 13.3,
+              "normScore": 0.0421,
+              "roles": {
+                "text": 1,
+                "bg": 0,
+                "border": 12
+              },
+              "oklch": {
+                "l": 0.845,
+                "c": 0,
+                "h": 0
+              },
+              "clusterMembers": [
+                {
+                  "hex": "#cccccc",
+                  "count": 13
+                }
+              ],
+              "pages": [
+                "company-careers-career-opportunities",
+                "sales-service-contact-sales"
+              ]
+            }
+          }
+        },
+        "700": {
+          "$value": "#555555",
+          "$type": "color",
+          "$extensions": {
+            "com.formfactor.www": {
+              "tier": "extended",
+              "authoredVar": null,
+              "generatedName": "neutral-700",
+              "count": 17,
+              "pageSpread": 1,
+              "pageSpreadPct": 6.7,
+              "normScore": 0.0512,
+              "roles": {
+                "text": 17,
+                "bg": 0,
+                "border": 0
+              },
+              "oklch": {
+                "l": 0.45,
+                "c": 0,
+                "h": 0
+              },
+              "clusterMembers": [
+                {
+                  "hex": "#555555",
+                  "count": 17
+                }
+              ],
+              "pages": [
+                "sales-service-contact-sales"
+              ]
+            }
+          }
+        },
+        "800": {
+          "$value": "#444444",
+          "$type": "color",
+          "$extensions": {
+            "com.formfactor.www": {
+              "tier": "extended",
+              "authoredVar": null,
+              "generatedName": "neutral-800",
+              "count": 14,
+              "pageSpread": 1,
+              "pageSpreadPct": 6.7,
+              "normScore": 0.0422,
+              "roles": {
+                "text": 5,
+                "bg": 0,
+                "border": 9
+              },
+              "oklch": {
+                "l": 0.387,
+                "c": 0,
+                "h": 0
+              },
+              "clusterMembers": [
+                {
+                  "hex": "#444444",
+                  "count": 14
+                }
+              ],
+              "pages": [
+                "sales-service-contact-sales"
+              ]
+            }
+          }
+        },
+        "800-2": {
+          "$value": "#333333",
+          "$type": "color",
+          "$extensions": {
+            "com.formfactor.www": {
+              "tier": "extended",
+              "authoredVar": null,
+              "generatedName": "neutral-800-2",
+              "count": 2,
+              "pageSpread": 1,
+              "pageSpreadPct": 6.7,
+              "normScore": 0.0075,
+              "roles": {
+                "text": 2,
+                "bg": 0,
+                "border": 0
+              },
+              "oklch": {
+                "l": 0.321,
+                "c": 0,
+                "h": 0
+              },
+              "clusterMembers": [
+                {
+                  "hex": "#333333",
+                  "count": 2
+                }
+              ],
+              "pages": [
+                "company-careers-career-opportunities"
+              ]
+            }
+          }
+        }
+      },
+      "orange": {
+        "600": {
+          "$value": "#b94a48",
+          "$type": "color",
+          "$extensions": {
+            "com.formfactor.www": {
+              "tier": "extended",
+              "authoredVar": null,
+              "generatedName": "orange-600",
+              "count": 13,
+              "pageSpread": 1,
+              "pageSpreadPct": 6.7,
+              "normScore": 0.0392,
+              "roles": {
+                "text": 13,
+                "bg": 0,
+                "border": 0
+              },
+              "oklch": {
+                "l": 0.556,
+                "c": 0.145,
+                "h": 24
+              },
+              "clusterMembers": [
+                {
+                  "hex": "#b94a48",
+                  "count": 13
+                }
+              ],
+              "pages": [
+                "sales-service-contact-sales"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "social": {
+      "blue-600": {
+        "$value": "#1e75b4",
+        "$type": "color",
+        "$description": "Social-platform brand color (share controls) — NOT a FormFactor color",
+        "$extensions": {
+          "com.formfactor.www": {
+            "tier": "core",
+            "authoredVar": null,
+            "generatedName": "blue-600",
+            "count": 3,
+            "pageSpread": 3,
+            "pageSpreadPct": 20,
+            "normScore": 0.0095,
+            "roles": {
+              "text": 0,
+              "bg": 3,
+              "border": 0
+            },
+            "oklch": {
+              "l": 0.544,
+              "c": 0.126,
+              "h": 245.7
+            },
+            "clusterMembers": [
+              {
+                "hex": "#1e75b4",
+                "count": 3
+              }
+            ],
+            "pages": [
+              "blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever",
+              "company-news-events-press-releases",
+              "press-release-formfactor-introduces-the-evolvity-300-probe-system"
+            ]
+          }
+        }
+      },
+      "blue-400": {
+        "$value": "#2bacdb",
+        "$type": "color",
+        "$description": "Social-platform brand color (share controls) — NOT a FormFactor color",
+        "$extensions": {
+          "com.formfactor.www": {
+            "tier": "core",
+            "authoredVar": null,
+            "generatedName": "blue-400",
+            "count": 3,
+            "pageSpread": 3,
+            "pageSpreadPct": 20,
+            "normScore": 0.0095,
+            "roles": {
+              "text": 0,
+              "bg": 3,
+              "border": 0
+            },
+            "oklch": {
+              "l": 0.698,
+              "c": 0.126,
+              "h": 228.3
+            },
+            "clusterMembers": [
+              {
+                "hex": "#2bacdb",
+                "count": 3
+              }
+            ],
+            "pages": [
+              "blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever",
+              "company-news-events-press-releases",
+              "press-release-formfactor-introduces-the-evolvity-300-probe-system"
+            ]
+          }
+        }
+      },
+      "indigo-800": {
+        "$value": "#2d3a8b",
+        "$type": "color",
+        "$description": "Social-platform brand color (share controls) — NOT a FormFactor color",
+        "$extensions": {
+          "com.formfactor.www": {
+            "tier": "core",
+            "authoredVar": null,
+            "generatedName": "indigo-800",
+            "count": 3,
+            "pageSpread": 3,
+            "pageSpreadPct": 20,
+            "normScore": 0.0095,
+            "roles": {
+              "text": 0,
+              "bg": 3,
+              "border": 0
+            },
+            "oklch": {
+              "l": 0.388,
+              "c": 0.135,
+              "h": 271.7
+            },
+            "clusterMembers": [
+              {
+                "hex": "#2d3a8b",
+                "count": 3
+              }
+            ],
+            "pages": [
+              "blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever",
+              "company-news-events-press-releases",
+              "press-release-formfactor-introduces-the-evolvity-300-probe-system"
+            ]
+          }
+        }
+      }
+    },
+    "brand": {
+      "primary": {
+        "$value": "{color.theme.primary}",
+        "$type": "color",
+        "$description": "Alias of the FormFactor brand primary (navy)"
+      },
+      "secondary": {
+        "$value": "{color.theme.secondary}",
+        "$type": "color",
+        "$description": "Alias of the FormFactor brand secondary (teal)"
+      }
+    }
+  }
+}

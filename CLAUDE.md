@@ -57,6 +57,7 @@ Don't re-derive these — they're checked, and a couple of them change the plan:
   only ~60 are FormFactor's.** Verified against `raw/home/css-variables.json`.
   Filter all of these before naming anything:
   - `--wp--*` / `--wp-*` — Gutenberg defaults (`#0693e3`, `#9b51e0`, `#f78da7`, …)
+  - `--wpdm-*` — WP Download Manager
   - `--fa-*` — Font Awesome
   - `--frm-*` — Formidable Forms (calendar widget styling)
   - `--ss-*` — slim-select dropdown (`#5897fb`, `#dc3545`, …)
@@ -209,15 +210,107 @@ Two P4/P6 hypotheses from CLAUDE.md now have answers:
   and cards (`a.site-header__logo`, `a.btn-inline` at 421×328, `a.whats-new-link`)
   whose inherited blue never paints visible text — latent, not visible drift, and
   not a palette entry.
-- **Geometry is bimodal, so "everything is a pill" is too strong.** Alongside
-  `--border-radius: 30px` the theme also authors `--border-radius-regular: 3px`
-  and `--border-radius-sm: 2px`. Confirm the split in P4 — the likely rule is
-  pill for controls, near-sharp for surfaces.
+- **~~Geometry is bimodal~~ — corrected in P3: "everything is a pill" holds.**
+  The theme *declares* `--border-radius-regular: 3px` and `--border-radius-sm: 2px`,
+  which looked like a bimodal split, but they are effectively dead: the only 2px
+  and 4px instances in the whole crawl come from plugin defaults
+  (`div.grecaptcha-badge`, `a.fl-button`, `input.frm_*`), never from theme markup.
+  The real rule is one radius everywhere — see the P3 findings below.
 - **Two-tone headings confirmed** on the homepage hero: "Semiconductor Test" in
   teal `--secondary` stacked directly above "and Measurement" in navy
   `--primary`, one sentence across two colors. Check it across templates in P6.
 - **The modular scale reaches typography, not just spacing.** The hero is 67px =
   16 × 4.2 = `--size-900` exactly. Desktop shows a tight 13 distinct font sizes.
+
+## What P3 established (2026-08-30)
+
+`analyze.ts` gained four corrections; all of them changed the output.
+
+- **Third-party overlay filtering (`isThirdPartyChrome`).** 1200 of 8345 elements
+  (14.4%) dropped. CookieYes was the known offender; the crawl also turned up
+  **WP Download Manager's `#wpdm-side-panel`**, one hidden instance per page
+  styled in stock Tailwind slate, which had put `#0f172a`, `#1e293b` and
+  `#64748b` into the palette as *core* tokens at a deceptive 15/15 page spread.
+  BB PowerPack (`pp-*`/`fl-*`) and Formidable (`frm-*`) are deliberately **not**
+  filtered — those plugins build FormFactor's real pages and forms.
+- **Page-weighted scoring (`Tally`).** Every ranking now uses `spread` (how many
+  templates) and `norm` (each page's observations sum to 1.0) instead of raw
+  count. The clearest vindication is in type: **18px has 3116 raw occurrences vs
+  16px's 3156 — near-tied — but norms of 3.46 vs 8.89**, because 18px is
+  concentrated in the two listing templates. Raw counts stay in `$extensions`.
+  - One trap found the hard way: `0px` is **92.9%** of all margin/padding
+    observations, so including it in the normalization denominator starved every
+    real value and collapsed the dominant set to four. Zero is a CSS default, not
+    a design decision — `collectSpacing` now skips it and emits `space.0`
+    explicitly.
+- **Authored-name reconciliation.** 13 authored color vars; **8 are load-bearing,
+  5 are declared-only** (`--secondary-light`, `--tertiary`, `--tertiary-dark`,
+  `--orange`, `--purple` never resolve onto a rendered element in these 15
+  templates). Treat those five as available-but-unproven.
+- **Vendor `:root` filtering.** 44 authored vars kept, 131 third-party filtered
+  across 8 prefixes.
+
+Two new categories that are observed but are *not* FormFactor's design language,
+now separated rather than silently tokenized:
+
+- **UA defaults** (`color.json` excludes them; REPORT lists them). `#0000ee` had
+  been ranking 5th with a 15/15 spread purely because `a.site-header__logo`
+  appears on every page. It is the *absence* of a color declaration, not a choice.
+- **Social-platform colors** → `color.social.*`. `#1e75b4` / `#2bacdb` /
+  `#2d3a8b` are LinkedIn/X/Facebook, appearing only as backgrounds on
+  `a.share-link` in editorial templates. Needed to build a share row; not part of
+  the brand palette.
+
+### The palette that survived
+
+Ordered by norm, and the top seven are *all* authored theme colors:
+
+| Token | Hex | Norm | Role |
+|---|---|---:|---|
+| `dark-grey` | `#6f6a67` | 6.60 | **body text** — the most-used color on the site |
+| `light` | `#ffffff` | 3.57 | surfaces + inverse text |
+| `primary` ⭐ | `#003a63` | 3.46 | headings, links, primary buttons |
+| `grey-secondary` | `#9c968d` | 0.65 | borders (128) + muted text (69) |
+| `secondary` ⭐ | `#00a0af` | 0.31 | teal accent — **text only, never a background** |
+| `dark` | `#003154` | 0.12 | **background only** (gradient endpoint / dark bands) |
+| `yellow` | `#d2d755` | 0.06 | footer text, all 15 pages |
+
+The two findings worth carrying into P6: **body text is a warm grey
+(`--dark-grey`), not navy or black**, and **`--secondary` is used exclusively as
+text while `--dark` is used exclusively as background** — those are rules, not
+coincidences.
+
+### Geometry — one radius, used everywhere
+
+| Radius | Count | Carried by |
+|---|---:|---|
+| `30px` | 115 | `article` 59 (cards), `a` 22, `div` 18, `button` 15 |
+| `20px` | 31 | form controls only — `input` 27, `select` 3, `textarea` 1 |
+| `100%` | 9 | `a.share-link` (circular social buttons) |
+| `30px 30px 0px 0px` | 15 | `a` — top-rounded card, 1/page |
+| `0px 0px 30px 30px` | 2 | `div.footer` — bottom-rounded footer |
+| `2px` / `4px` / `10px` / `40px` | 1–3 each | plugin defaults only, not theme markup |
+
+So the same 30px applies to cards *and* buttons: it reads as a full pill on a
+40px control and as a generously rounded rectangle on a 328px card. **There is no
+sharp geometry in theme-authored UI.** Form fields are the one deliberate
+exception at 20px.
+
+### Scales
+
+- **Spacing is a 1.334× modular scale**, reconstructed from the `--size-*`
+  multipliers (which resolve as unevaluated strings like `1 * 1.33`). The
+  observed values confirm it: 12 (Δ0), 16 (Δ0) and 21 (Δ0.3) carry the three
+  highest norms. The "2px grid" the detector reports is an artifact of trying to
+  read a grid off a multiplier scale — ignore it.
+- **Type is Proxima Nova, base 16px, 13 sizes.** The modular scale reaches type
+  but only partly: 16 (`--size-400`), 21 (`--size-500`), 28 (`--size-600`),
+  38 (`--size-700`) and 67 (`--size-900`) map cleanly; 14, 18, 19, 25, 26, 30 and
+  45 do not. The hero 67px appears on 13/15 pages.
+- **Elevation barely exists.** Two shadows: `rgba(0,0,0,0.2) 0 4px 15px` (102×)
+  and a lighter `rgba(0,0,0,0.1) 0 4px 20px` (15×). Three single-instance
+  plugin shadows are held back as drift rather than named `lg`/`xl`/`2xl`, which
+  would invent an elevation scale the site does not have.
 
 ## Phases (checkpoint-driven — stop at each for review)
 
@@ -234,10 +327,11 @@ Two P4/P6 hypotheses from CLAUDE.md now have answers:
   wrong. Both passes: **15 ok / 0 failed**, all 6 artifacts on every page
   (90 files desktop / 90 mobile, 44 MB + 28 MB). Findings that change P3/P4 are
   in "What P2 verified" above.
-- **P3 — Analyze → tokens.** Cluster colors, derive type + spacing scales, emit
-  `tokens/` + `REPORT.md`. **Reconcile against the authored `:root` names** —
-  where a cluster matches an authored var, use FormFactor's name. ✅ when the
-  palette reviews clean and `npm run validate:tokens` passes.
+- **P3 — Analyze → tokens.** ✅ **DONE** (2026-08-30). `tokens/` holds
+  color/typography/spacing/radius/shadow + `REPORT.md`; `npm run validate:tokens`
+  passes (109 tokens, 2 aliases resolve). Authored-name reconciliation is in:
+  `color.theme.*` uses FormFactor's own names and keeps the oklch name as
+  `generatedName`. See "What P3 established" below.
 - **P4 — Components.** Cluster repeated elements + read them off screenshots →
   `components/*.mdx`. Two heuristics inherited from the internal-app version
   **need retuning here and are flagged in the code**: `nav-item` now bounds by
