@@ -547,6 +547,81 @@ Two structural exceptions:
 Heading *color* does not change with viewport at all — only size. And the
 homepage two-tone heading survives to 390px intact.
 
+## What P6 established (2026-08-30)
+
+The judgment layer. Deliverables:
+
+| File | Role |
+|---|---|
+| `README.md` | Entry point. Three headline rules, quick start, file map, provenance. |
+| `docs/design-system.md` | Full spec: tokens with evidence, heading roles, **ten-rule constitution**, honest gaps (§12). |
+| `docs/patterns.md` | Eight composition patterns: hero, card grid, CTA panel, dark band, `.flow` rhythm, form, header, footer. |
+| `tokens/tokens.css` | **Generated** by `analyze.ts` — all tokens as `--ff-*` props with responsive overrides. |
+| `tokens/utilities.css` | **Hand-written**, never regenerated — the composition layer. |
+| `examples/landing.html` | A full page built from only those two stylesheets. |
+
+### Why the CSS is split in two
+
+`tokens.css` is regenerated on every `analyze` run, so anything hand-authored in
+it would be destroyed. The composition layer therefore lives in a separate,
+durable `utilities.css`. Tokens are mechanical; the utilities encode judgment.
+
+All custom properties are prefixed `--ff-` rather than reusing the theme's bare
+`--primary`. Bare names are exactly what collided with BB PowerPack's
+`--color-primary` on the real site — a prototype that also loads Bootstrap or a
+page builder would hit the same thing.
+
+### Three bugs the example caught that the numbers could not
+
+Rendering `examples/landing.html` and reading back computed values found problems
+no amount of token inspection would have surfaced:
+
+1. **The page rendered in serif.** The site's computed `font-family` is bare
+   `"Proxima Nova"` with no fallback — fine in production where the webfont always
+   loads, fatal in a prototype without the licensed font, where the browser falls
+   back to its default *serif*. The emitter now appends a system-sans chain and
+   labels it as generator-added, not observed.
+2. **A light button on a dark band had invisible text.** `.ff-on-dark a`
+   (specificity 0,1,1) outranks `.ff-btn--light` (0,1,0), so the label went white
+   on a white fill. Fixed with `:not(.ff-btn)`.
+3. **Card images floated inside the card padding.** The observed
+   `border-radius: 30px 30px 0 0` on a card image only makes sense if the image
+   meets the card edge, which it cannot do inside uniform padding. Added
+   `.ff-card--media` (full-bleed image + padded `__body`), which clips corners via
+   `overflow: hidden`.
+
+This is the same lesson as P4's pseudo-element blindness, arriving from the other
+direction: **the extraction is not done until something has been rendered and
+looked at.** Recorded in §12 of the spec so a future reader inherits it.
+
+### Verified rendering
+
+`examples/landing.html` was rendered at 1440/1280/390 and computed values read
+back. Every constitution rule holds:
+
+| Check | 1440 | 1280 | 390 |
+|---|---|---|---|
+| `h1` size | 67.2px | 50.4px | 37.8px |
+| `h1` color / span | teal / navy | teal / navy | teal / navy |
+| body copy | `#6f6a67` | `#6f6a67` | `#6f6a67` |
+| radius (card, button) | 30px | 30px | 20px |
+| form field radius | 20px | 20px | 20px |
+| hero rule | `#f26728` | `#f26728` | `#f26728` |
+| container | 1433px | 1040px | 1040px |
+
+Hero button measures 40px tall at 30px radius — a true pill, matching the live
+site. Section `h2` teal, dark-band `h2` white, card title navy: the three-way
+heading rule renders correctly.
+
+### The constitution
+
+Ten rules in §11 of the spec, plus two anti-rules (don't use `--color-primary`;
+don't copy `a.btn-inline`). The three that carry the most weight:
+
+1. Headings teal, body copy warm grey.
+2. Everything rounds at 30px — cards *and* buttons; only form fields differ.
+3. Weight 400 everywhere; size carries hierarchy, never bold.
+
 ## Phases (checkpoint-driven — stop at each for review)
 
 - **P0 — Scaffold + smoke test.** ✅ **DONE.** `npm install`, chromium present,
@@ -586,11 +661,12 @@ homepage two-tone heading survives to 390px intact.
   the theme's own bands is sampled, not just the two extremes:
   `npm run crawl:tablet` (768) and `npm run crawl:laptop` (1280) were added.
   `validate:tokens` passes (118 tokens across 6 files). See "What P5 established".
-- **P6 — Finalize.** Write `README.md` as the entry point for the consuming
-  agent, in the shape of `~/Code/ahead-design-system`: a short constitution of
-  rules that must never break, a composition-pattern library, and an honest-gaps
-  section. **This is the judgment layer and it is the point of the exercise** —
-  the tokens are mechanical, the rules are not.
+- **P6 — Finalize.** ✅ **DONE** (2026-08-30). `README.md` rewritten as the entry
+  point; `docs/design-system.md` (spec + **ten-rule constitution** + honest gaps);
+  `docs/patterns.md` (eight composition patterns); `tokens/tokens.css` (generated)
+  + `tokens/utilities.css` (hand-written composition layer);
+  `examples/landing.html`, verified rendering at 1440/1280/390. See
+  "What P6 established" above.
 
   Two candidate signatures to test while you're there, both visible in
   `raw/home/screenshot-viewport.png`:

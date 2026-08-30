@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contact Intelligence — FormFactor design system example</title>
+
+  <!-- Generated tokens, then the hand-written composition layer. -->
+  <link rel="stylesheet" href="../tokens/tokens.css">
+  <link rel="stylesheet" href="../tokens/utilities.css">
+
+  <!--
+    A full page assembled only from tokens/ + utilities.css, to demonstrate the
+    composition patterns in docs/patterns.md.
+
+    Proxima Nova is FormFactor's typeface and is not redistributed here, so this
+    renders in the fallback stack. Every image is a placehold.co placeholder —
+    FormFactor's photography and logos are never shipped from this repo.
+  -->
+  <style>
+    /* Example-only: offset the fixed header, and fake the washed hero backdrop. */
+    body { padding-top: var(--ff-header-height); }
+    .demo-hero-bg {
+      background: linear-gradient(160deg, #eaf6f8 0%, #f7fbfc 55%, #ffffff 100%);
+    }
+    .demo-note {
+      font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+      color: var(--ff-grey-secondary);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============ Header (pattern G) ============ -->
+<header class="ff-header">
+  <div class="ff-wrapper ff-header__inner">
+    <a href="#"><img src="https://placehold.co/340x60/003a63/ffffff?text=LOGO+340x60" alt="Logo placeholder" width="340" height="60"></a>
+    <nav class="ff-nav">
+      <a href="#" aria-current="page">Products</a>
+      <a href="#">Applications</a>
+      <a href="#">Industries</a>
+      <a href="#">Sales &amp; Service</a>
+      <a href="#">Company</a>
+    </nav>
+  </div>
+</header>
+
+<!-- Persistent edge tab (pattern G) -->
+<a class="ff-btn ff-edge-tab" href="#contact">Contact us</a>
+
+<main>
+
+  <!-- ============ Hero, two-tone variant (pattern A) ============ -->
+  <div class="ff-hero demo-hero-bg">
+    <div class="ff-wrapper">
+      <div class="ff-hero__body ff-flow">
+        <h1 class="ff-h1">Contact Intelligence <span>from lab to fab</span></h1>
+        <div class="ff-flow ff-flow-space-300">
+          <p>Measurement you can act on at every stage of the IC life cycle —
+             characterization, modeling, reliability and production test.</p>
+        </div>
+        <a class="ff-btn ff-flow-space-500" href="#products">Explore products</a>
+      </div>
+      <hr class="ff-hero__rule">
+    </div>
+  </div>
+
+  <!-- ============ Breadcrumb ============ -->
+  <div class="ff-wrapper" style="padding-top: var(--ff-space-400)">
+    <nav class="demo-note"><a href="#">Home</a> / <a href="#">Technologies</a> / Contact Intelligence</nav>
+  </div>
+
+  <!-- ============ Prose section (pattern E) ============ -->
+  <section class="ff-section" id="products">
+    <div class="ff-wrapper ff-flow">
+      <h2 class="ff-h2" style="max-width: 22ch">Why measurement infrastructure decides yield</h2>
+      <p style="max-width: 62ch">As devices stack into compact multi-die packages, the cost of finding a
+         defect late rises with every step it survives. Test infrastructure is the
+         shortest lever on that cost.</p>
+      <p style="max-width: 62ch">The same probe technology that qualifies a process in engineering has to
+         survive millions of touchdowns in production — which makes contact
+         repeatability, not raw throughput, the number worth optimising.</p>
+    </div>
+  </section>
+
+  <!-- ============ Card grid (pattern B) ============ -->
+  <section class="ff-section">
+    <div class="ff-wrapper ff-flow">
+      <h2 class="ff-h2">Explore our products</h2>
+      <ul class="ff-card-grid">
+        <li>
+          <article class="ff-card ff-card--media">
+            <img src="https://placehold.co/600x400/e1e1e1/6f6a67?text=600x400" alt="" width="600" height="400">
+            <div class="ff-card__body ff-flow ff-flow-space-400">
+              <h3 class="ff-h3 ff-card-title">Foundry &amp; Logic</h3>
+              <p>High-parallelism probe cards for advanced-node logic test.</p>
+              <a class="ff-btn" href="#">View family</a>
+            </div>
+          </article>
+        </li>
+        <li>
+          <article class="ff-card ff-card--media">
+            <img src="https://placehold.co/600x400/e1e1e1/6f6a67?text=600x400" alt="" width="600" height="400">
+            <div class="ff-card__body ff-flow ff-flow-space-400">
+              <h3 class="ff-h3 ff-card-title">DRAM</h3>
+              <p>Matrix and PH-Series cards built for high-density memory test.</p>
+              <a class="ff-btn" href="#">View family</a>
+            </div>
+          </article>
+        </li>
+        <li>
+          <article class="ff-card ff-card--media">
+            <img src="https://placehold.co/600x400/e1e1e1/6f6a67?text=600x400" alt="" width="600" height="400">
+            <div class="ff-card__body ff-flow ff-flow-space-400">
+              <h3 class="ff-h3 ff-card-title">Quantum &amp; Cryogenic</h3>
+              <p>Cryogenic probe systems for quantum device characterization.</p>
+              <a class="ff-btn" href="#">View family</a>
+            </div>
+          </article>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ Dark band (pattern D) ============ -->
+  <section class="ff-section ff-on-dark">
+    <div class="ff-wrapper ff-flow ff-center" style="max-width: 44rem">
+      <h2 class="ff-h2">Engineered for the shortest path</h2>
+      <p>One measurement platform across characterization, reliability and
+         production — so the data you qualify with is the data you ship with.</p>
+      <a class="ff-btn ff-btn--light" href="#">See how it works</a>
+    </div>
+  </section>
+
+  <!-- ============ CTA panel, two-tone (pattern C) ============ -->
+  <section class="ff-section">
+    <div class="ff-wrapper">
+      <div class="ff-card ff-flow">
+        <div class="ff-center">
+          <h2 class="ff-h2">When market pressure demands the shortest possible
+            path from concept to volume production, <span>we deliver.</span></h2>
+        </div>
+        <ul class="ff-card-grid">
+          <li class="ff-flow ff-flow-space-600">
+            <p>Talk to an applications engineer about your specific test challenge.</p>
+            <a class="ff-btn" href="#contact">Contact sales</a>
+          </li>
+          <li class="ff-flow ff-flow-space-600">
+            <p>Browse probe cards by device family and process node.</p>
+            <a class="ff-btn" href="#products">See all products</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Form (pattern F) ============ -->
+  <section class="ff-section" id="contact">
+    <div class="ff-wrapper ff-flow" style="max-width: 34rem">
+      <h2 class="ff-h2">Talk to sales</h2>
+      <form class="ff-flow ff-flow-space-500" onsubmit="return false">
+        <div class="ff-field">
+          <label for="email">Work email</label>
+          <input type="email" id="email" name="email" placeholder="you@company.com">
+        </div>
+        <div class="ff-field">
+          <label for="app">Application</label>
+          <select id="app" name="app">
+            <option>Foundry &amp; logic</option>
+            <option>DRAM</option>
+            <option>Quantum &amp; cryogenic</option>
+          </select>
+        </div>
+        <div class="ff-field">
+          <label for="detail">What are you testing?</label>
+          <textarea id="detail" name="detail" rows="4"></textarea>
+        </div>
+        <button class="ff-btn" type="submit">Submit</button>
+      </form>
+      <p class="demo-note">Fields are 20px — the one deliberate geometry exception.</p>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ Footer (pattern H) ============ -->
+<footer class="ff-footer">
+  <div class="ff-wrapper">
+    <div class="ff-footer__grid">
+      <div>
+        <h3>Products</h3>
+        <ul>
+          <li><a href="#">Probe cards</a></li>
+          <li><a href="#">Probes</a></li>
+          <li><a href="#">Probe systems</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Applications</h3>
+        <ul>
+          <li><a href="#">Case studies</a></li>
+          <li><a href="#">Technologies</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Industries</h3>
+        <ul>
+          <li><a href="#">Automotive</a></li>
+          <li><a href="#">Consumer</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Company</h3>
+        <ul>
+          <li><a href="#">About us</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">News &amp; events</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="ff-footer__info">
+      <p>&copy; FormFactor, Inc. — example page, not affiliated with or endorsed by FormFactor.</p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

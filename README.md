@@ -1,72 +1,55 @@
 # FormFactor Design System
 
-A versioned, machine-readable distillation of the design language of
-**www.formfactor.com**, extracted from the live, rendered site and shaped into
-**design tokens** and **component specs** that an agent can consume when building
-new FormFactor-styled pages and prototypes.
+A reverse-engineered design system extracted from [www.formfactor.com](https://www.formfactor.com), packaged so an agent (or a person) can build on-brand FormFactor pages and prototypes.
 
-It is reverse-engineered from *computed styles* (ground truth), cross-checked
-against the theme's own authored `:root` variables. For the architecture and the
-reasoning behind every decision, see [`CLAUDE.md`](./CLAUDE.md). This file is the
-**entry point**: what's here and how to use it.
-
-> **Status: scaffold, pipeline verified.** `npm run typecheck` is clean and a
-> single-page smoke crawl of the homepage succeeds end to end (339 elements, 173
-> `:root` vars, 11 stateful elements, consent banner dismissed). `tokens/` and
-> `components/` do not exist yet — run the phases in `CLAUDE.md` to populate them.
+Everything here is derived from the **rendered** site — `getComputedStyle` on 15 page templates at four viewport widths — and reconciled against the `formfactor-2022` WordPress theme's own authored `:root` variables. Where FormFactor named a token, that name is used.
 
 ---
 
-## What's here now
+## Start here
 
+**Building a page?** Read [`docs/design-system.md` §11](docs/design-system.md#11-constitution--ten-rules-a-prototype-must-not-break) — ten rules, one screen. Then [`docs/patterns.md`](docs/patterns.md) for the compositions.
+
+**Just want the three that matter most?**
+
+1. **Headings are teal `#00A0AF`. Body copy is warm grey `#6F6A67`.** Not navy headings, not black text. This one pairing does more than anything else to make a page read as FormFactor.
+2. **Everything rounds at 30px — cards *and* buttons.** A 40px-tall button becomes a full pill; that's the intended read. Form fields at 20px are the only exception. Nothing is sharp.
+3. **Weight 400 everywhere.** Hierarchy comes from size, never bold. A 67px hero heading at weight 400 is correct.
+
+## Quick start
+
+```html
+<link rel="stylesheet" href="tokens/tokens.css">     <!-- generated tokens -->
+<link rel="stylesheet" href="tokens/utilities.css">  <!-- composition layer -->
+
+<div class="ff-hero">
+  <div class="ff-wrapper">
+    <div class="ff-hero__body ff-flow">
+      <h1 class="ff-h1">Contact Intelligence <span>from lab to fab</span></h1>
+      <p>Measurement you can act on at every stage of the IC life cycle.</p>
+      <a class="ff-btn" href="/products/">Explore products</a>
+    </div>
+    <hr class="ff-hero__rule">
+  </div>
+</div>
 ```
-scripts/
-  crawl.ts            stage 1 — visit seeds, dump raw artifacts   (touches network)
-  analyze.ts          stage 2 — raw/ → tokens/ + components/      (no network)
-  validate-tokens.ts  sanity check on tokens/
-seeds.txt             the curated page list — 16 pages, one per archetype
-CLAUDE.md             architecture, verified findings, phased build plan
-```
 
-And what the pipeline will produce:
+That renders the signature hero: teal heading with a navy second clause, warm-grey summary, navy pill CTA, and the 4px orange rule that closes every FormFactor hero.
 
-```
-raw/           git-ignored — per-page computed styles, CSS vars, CSS, two
-               screenshots (full-page + above-the-fold), and states.json
-               (:hover/:focus/:active deltas)
-raw-mobile/    git-ignored — the same seeds at 390x844
-tokens/        W3C Design Tokens — color, typography, spacing, radius, shadow + REPORT.md
-components/    one MDX per component — purpose, variants, canonical example
-```
+Open [`examples/landing.html`](examples/landing.html) in a browser for a full page — hero, card grid, dark band, CTA panel, form, footer — built from nothing but these two stylesheets.
 
----
+## What's here
 
-## The system at a glance
-
-Everything below comes from the theme's own `:root` variables as they *compute*
-on the live homepage (`raw/home/css-variables.json`). Treat it as the starting
-hypothesis the full crawl confirms or corrects — the clustering across all 16
-seeds is what establishes which of these are load-bearing and which are declared
-but unused.
-
-| Aspect | Value |
+| Path | What's in it |
 |---|---|
-| **Brand primary** | `#003A63` — deep navy (`--primary`) |
-| **Brand secondary** | `#00A0AF` — teal (`--secondary`), light `#22b5d4` |
-| **Tertiary** | `#4D7592` / `#336182` — muted slate blues |
-| **Neutrals** | white `#FFFFFF`, `#E1E1E1`, `#6F6A67`, `#9C968D` (warm greys) |
-| **Accents** | orange `#F26728`, purple `#7C2855`, yellow `#D2D755` |
-| **Font** | Proxima Nova |
-| **Spacing** | modular scale off `--base-size`, ~1.33 ratio (0.56 → 7.5) |
-| **Container** | ~1390px + gutters (the theme source says `65rem`; the *computed* value is `calc(1390px + 1 * 1.33 * 2rem)`) |
-| **Radius** | `--border-radius: 30px` — buttons render as full pills |
-| **Platform tells** | WordPress + `formfactor-2022` theme, BB PowerPack page builder, Formidable Forms, Font Awesome 6.4.2 |
-
-The warm greys (`#6F6A67`, `#9C968D`) sitting next to cool navy/teal is an
-unusual pairing and worth confirming in P3 — it may be a real signature or it may
-be legacy drift.
-
----
+| [`docs/design-system.md`](docs/design-system.md) | The spec. Tokens with evidence counts, heading roles, the **ten-rule constitution**, and an honest-gaps section. |
+| [`docs/patterns.md`](docs/patterns.md) | Composition patterns — hero, card grid, CTA panel, dark band, `.flow` rhythm, form, header, footer. |
+| `tokens/tokens.css` | **Generated.** All tokens as `--ff-*` custom properties, including the responsive overrides. Never hand-edit. |
+| `tokens/utilities.css` | **Hand-written.** The composition layer (`.ff-flow`, `.ff-radius`, `.ff-btn`, `.ff-card`…). `analyze.ts` never touches it. |
+| `tokens/*.json` | W3C Design Tokens — color, typography, spacing, radius, shadow, breakpoints. Each token carries provenance under `$extensions["com.formfactor.www"]`: observed count, page spread, role split, oklch, merged raw colors, and source pages. |
+| `tokens/REPORT.md` | The audit trail. Palette histogram, load-bearing vs declared-only vars, responsive tables, and what was filtered out and why. |
+| `components/*.mdx` | 12 components — purpose, when-to-use, variant table, canonical markup, rules-and-gotchas, screenshot region. |
+| `CLAUDE.md` | Architecture, every verified finding, and the phased build log. Start here to change the pipeline. |
 
 ## Regenerating
 
@@ -74,45 +57,31 @@ be legacy drift.
 npm install
 npx playwright install chromium
 
-# Smoke test — one page.
-FF_SEEDS=https://www.formfactor.com/ npm run crawl
+npm run crawl           # 1440x900 -> raw/          (touches network)
+npm run crawl:mobile    #  390x844 -> raw-mobile/
+npm run crawl:tablet    #  768x1024 -> raw-tablet/
+npm run crawl:laptop    # 1280x800 -> raw-laptop/
 
-# Stage 1 — crawl all seeds (desktop, then mobile).
-npm run crawl
-npm run crawl:mobile
-
-# Stage 2 — distill raw/ into tokens/ + components/ (no network; re-run freely).
-npm run analyze
-
-# Sanity-check the emitted tokens.
+npm run analyze         # raw*/ -> tokens/ + components/   (no network, re-run freely)
 npm run validate:tokens
 ```
 
-**Crawl knobs** (env): `FF_BASE_URL`, `FF_SEEDS` (comma/newline list — crawl just
-these), `FF_OUTPUT_DIR`, `FF_VIEWPORT` (`WxH`), `FF_NAV_TIMEOUT_MS`,
-`FF_SETTLE_MS`, `FF_DOM_QUIET_MS`, `FF_DOM_MAX_MS`, `FF_AUTOSCROLL=0`,
-`FF_CAPTURE_STATES=0`, `FF_MAX_STATE_TARGETS`, `FF_CONSENT_TIMEOUT_MS`,
-`FF_FOLLOW_LINKS=1`, `FF_MAX_PAGES`, `FF_HEADED=1`, `FF_BROWSER_PATH`.
+Crawling is slow and analysis is fast, which is why they're separate scripts — you re-run `analyze` constantly while tuning and `crawl` rarely. It also means drift detection is nearly free: re-crawl on a schedule, re-analyze, diff `tokens/`.
 
-**Analyze knobs:** `ANALYZE_COLOR_DELTA` (cluster tightness),
-`ANALYZE_COLOR_MIN_COUNT`, `FF_BRAND_HEXES`.
+Four viewports because the theme names four bands (`base` / `-t` 480 / `-sd` 1024 / `-hd` 1435). The two middle crawls aren't optional decoration — they're what revealed that the type scale has only *three* effective steps, and that the container width regresses at `-sd`.
 
-> The site blocks non-browser User-Agents — `crawl.ts` pins a desktop Chrome UA.
-> If every page starts returning 403, check that first.
+## Provenance & honesty
 
-> Two screenshots per page, on purpose: Chromium's `fullPage` capture drops the
-> fixed `#site-header`, so `screenshot-viewport.png` is the reliable record of the
-> header, primary nav and above-the-fold hero. Use it when reading components.
+- **Ground truth is computed style, not source CSS.** A WordPress page is the sum of a theme, a page builder, a forms plugin, WooCommerce and Font Awesome; the source is not the intent. The clearest example: the theme declares `--wrapper-max-width: 65rem` (1040px) but the value that actually resolves at desktop is ~1433px.
+- **Third-party noise is filtered, and it's substantial.** 14.7% of captured elements are CookieYes and WP Download Manager chrome. Left in, CookieYes's own `#212121` ranks 4th in the palette on 885 occurrences — a color FormFactor never uses. 131 of 175 `:root` vars belong to plugins, including a `--color-primary: #4a8eff` that is *not* FormFactor's navy.
+- **Frequencies are page-weighted.** Two paginated index templates are half the captured elements, so raw counts describe a press-release list item rather than the site.
+- **Two findings were invisible until a screenshot was examined by eye** — colors painted by `::before`/`::after`, and border colors on non-top edges. Both are fixed in the crawler now, but the lesson generalises: treat any purely computed-style extraction as incomplete until checked against an image. Including this one.
+- **What this does not recover** — motion, hover/focus states (captured in `raw/*/states.json` but not yet folded in), open mega-menu state, iconography rules, and every editorial judgment. The full list is [§12 of the spec](docs/design-system.md#12-honest-gaps).
 
----
+`raw/` and its siblings are git-ignored. This repo ships the distilled system and the scripts, never the scrape.
 
-## Provenance
+## License & scope
 
-Adapted from `~/Code/ahead-unity`, which runs the same two-stage pipeline against
-an internal SSO-protected app. The auth stage is removed here; consent-overlay
-dismissal, a pinned User-Agent, reduced-motion capture and a mobile pass are
-added. The output shape to aim for — constitution, composition patterns, honest
-gaps — is modeled on `~/Code/ahead-design-system`.
+A reverse-engineered reference for prototyping and internal design work. **The design language belongs to FormFactor, Inc.** Don't use this for anything that competes with, impersonates, or misrepresents FormFactor.
 
-This is a reverse-engineered reference repo built from a public website. It ships
-tokens and specs, never the scrape, and never FormFactor's logos or photography.
+No FormFactor logos or photography are redistributed here — every example uses `placehold.co`. Proxima Nova is FormFactor's licensed typeface and is not included; `tokens.css` names it first and falls back to a system sans.

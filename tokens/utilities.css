@@ -1,0 +1,286 @@
+/*
+ * FormFactor composition layer.
+ *
+ * HAND-WRITTEN and durable — unlike tokens.css, `npm run analyze` never touches
+ * this file. It reimplements the handful of utilities the formfactor-2022 theme
+ * actually composes pages out of, so a prototype can be assembled the way the
+ * real site is rather than with ad-hoc margins.
+ *
+ * Load after tokens.css:
+ *   <link rel="stylesheet" href="tokens/tokens.css">
+ *   <link rel="stylesheet" href="tokens/utilities.css">
+ *
+ * Class names are prefixed `ff-` so they cannot collide with the real theme's
+ * unprefixed ones if both ever load together. The mapping to FormFactor's own
+ * names is noted on each rule.
+ */
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+body {
+  margin: 0;
+  font-family: var(--ff-font-sans);
+  font-size: var(--ff-text-base);
+  line-height: 1.5;
+  color: var(--ff-dark-grey);          /* body copy is warm grey, not black */
+  background: var(--ff-light);
+}
+
+/* ==========================================================================
+   Vertical rhythm — the owl selector
+   --------------------------------------------------------------------------
+   FormFactor's `.flow`. This one rule provides essentially all vertical spacing
+   on the site; individual elements do not carry margins. Override the step with
+   a .ff-flow-space-* modifier on the same element.
+   ========================================================================== */
+
+.ff-flow > * + * { margin-top: var(--ff-flow-space, var(--ff-space-600)); }
+
+.ff-flow-space-200 { --ff-flow-space: var(--ff-space-200); }
+.ff-flow-space-300 { --ff-flow-space: var(--ff-space-300); }
+.ff-flow-space-400 { --ff-flow-space: var(--ff-space-400); }
+.ff-flow-space-500 { --ff-flow-space: var(--ff-space-500); }
+.ff-flow-space-600 { --ff-flow-space: var(--ff-space-600); }
+.ff-flow-space-700 { --ff-flow-space: var(--ff-space-700); }
+.ff-flow-space-800 { --ff-flow-space: var(--ff-space-800); }
+.ff-flow-space-900 { --ff-flow-space: var(--ff-space-900); }
+
+/* ==========================================================================
+   Container + section rhythm
+   FormFactor's `.wrapper` and `.section-padding`.
+   ========================================================================== */
+
+.ff-wrapper {
+  max-width: var(--ff-wrapper-max);
+  margin-inline: auto;
+  padding-inline: var(--ff-space-500);
+}
+
+.ff-section { padding-block: var(--ff-space-700); }
+@media (min-width: 480px)  { .ff-section { padding-block: var(--ff-space-800); } }
+@media (min-width: 1435px) { .ff-section { padding-block: var(--ff-space-900); } }
+
+.ff-center { text-align: center; margin-inline: auto; }
+
+/* ==========================================================================
+   Geometry — one radius, one shadow
+   FormFactor's `.radius` and `.shadow`. Because both read a custom property,
+   they are responsive for free.
+   ========================================================================== */
+
+.ff-radius { border-radius: var(--ff-radius); }
+/* Top-rounded only, for an image or block that meets a container's bottom edge.
+   Not needed inside .ff-card--media — that clips its own corners via
+   overflow: hidden. Use this when the element is not in a rounded container. */
+.ff-radius-top {
+  border-radius: var(--ff-radius) var(--ff-radius) 0 0;
+}
+.ff-shadow { box-shadow: var(--ff-shadow); }
+.ff-shadow-soft { box-shadow: var(--ff-shadow-soft); }
+
+/* ==========================================================================
+   Headings
+   --------------------------------------------------------------------------
+   Teal is the DEFAULT heading color and weight is 400 at every level — size
+   carries the hierarchy, not weight. A heading that is itself a link renders
+   navy (see .ff-card-title), which is inheritance, not a separate rule.
+   ========================================================================== */
+
+.ff-h1, .ff-h2, .ff-h3, .ff-h4 {
+  margin: 0;
+  font-weight: 400;
+  color: var(--ff-secondary);
+}
+
+.ff-h1 { font-size: var(--ff-text-h1); line-height: 1.12; }
+.ff-h2 { font-size: var(--ff-text-h2); line-height: 1.1; letter-spacing: -0.01em; }
+.ff-h3 { font-size: var(--ff-text-h3); line-height: 1;    letter-spacing: -0.02em; }
+.ff-h4 { font-size: var(--ff-text-h4); line-height: 1.25; }
+
+/* Two-tone heading: teal lead + navy emphasis. Used sparingly — the homepage
+   hero, the homepage CTA panel, and the products category heading. */
+.ff-h1 > span, .ff-h2 > span, .ff-h3 > span { color: var(--ff-primary); }
+
+/* Headings on a dark band. */
+.ff-on-dark .ff-h1,
+.ff-on-dark .ff-h2,
+.ff-on-dark .ff-h3,
+.ff-on-dark .ff-h4 { color: var(--ff-light); }
+.ff-on-dark { color: var(--ff-light); background: var(--ff-dark); }
+/* :not(.ff-btn) matters — `.ff-on-dark a` (0,1,1) outranks `.ff-btn--light`
+   (0,1,0), so without it a light button on a dark band gets a white label on a
+   white fill and the text disappears. */
+.ff-on-dark a:not(.ff-btn) { color: var(--ff-light); }
+
+/* ==========================================================================
+   Links
+   ========================================================================== */
+
+a { color: var(--ff-primary); }
+
+/* ==========================================================================
+   Buttons — pills. 30px on a 40px control is a full pill; that is the read.
+   ========================================================================== */
+
+.ff-btn {
+  display: inline-block;
+  padding: 8px 20px;
+  border: 0;
+  border-radius: var(--ff-radius);
+  font: inherit;
+  font-size: var(--ff-text-base);
+  font-weight: 700;
+  line-height: 1.5;
+  text-decoration: none;
+  cursor: pointer;
+  background: var(--ff-primary);
+  color: var(--ff-light);
+}
+.ff-btn:hover { background: var(--ff-dark); }
+
+.ff-btn--light {                                    /* for dark bands */
+  background: var(--ff-light);
+  color: var(--ff-primary);
+}
+.ff-btn--light:hover { background: var(--ff-grey); }
+
+/* The persistent right-edge tab. Present on every page of the real site. */
+.ff-edge-tab {
+  position: fixed;
+  right: 0;
+  top: 25%;
+  z-index: 9;
+  transform: rotate(-90deg) translate(-50%);
+  transform-origin: right bottom;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* ==========================================================================
+   Cards
+   ========================================================================== */
+
+.ff-card-grid {
+  display: grid;
+  gap: var(--ff-space-600);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ff-card {
+  border-radius: var(--ff-radius);
+  background: var(--ff-light);
+  box-shadow: var(--ff-shadow);
+  padding: var(--ff-space-600);
+  overflow: hidden;
+}
+
+/* Media card: the image goes edge-to-edge and the text is padded separately.
+   This is how the real product cards are built — the observed
+   `border-radius: 30px 30px 0 0` on a card image only makes sense if the image
+   meets the card edge, which it cannot do inside uniform card padding. */
+.ff-card--media { padding: 0; }
+.ff-card--media > img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.ff-card__body { padding: var(--ff-space-600); }
+
+/* A card title is a link, so it reads navy rather than teal. */
+.ff-card-title { color: var(--ff-primary); }
+
+/* ==========================================================================
+   Hero
+   ========================================================================== */
+
+.ff-hero { position: relative; padding-block: var(--ff-space-800); }
+.ff-hero__body { max-width: 48rem; }
+
+/* The 4px orange rule that closes every hero. On the real site this is a
+   ::after on .page-header__body — the only place --orange appears. */
+.ff-hero__rule {
+  display: block;
+  width: 100%;
+  height: 4px;
+  background: var(--ff-orange);
+  margin-top: var(--ff-space-700);
+  border: 0;
+}
+
+/* ==========================================================================
+   Form fields — the one deliberate geometry exception, 20px not 30px.
+   ========================================================================== */
+
+.ff-field { display: block; }
+.ff-field label {
+  display: block;
+  margin-bottom: var(--ff-space-200);
+  color: var(--ff-primary);
+}
+.ff-field input,
+.ff-field select,
+.ff-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 16px;
+  border: 1px solid var(--ff-grey-secondary);
+  border-radius: var(--ff-radius-field);
+  font: inherit;
+  color: var(--ff-dark-grey);
+}
+.ff-field input:focus,
+.ff-field select:focus,
+.ff-field textarea:focus {
+  outline: 2px solid var(--ff-secondary);
+  outline-offset: 1px;
+}
+
+/* ==========================================================================
+   Header + footer
+   ========================================================================== */
+
+.ff-header {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 6;
+  height: var(--ff-header-height);
+  display: flex;
+  align-items: center;
+  background: var(--ff-light);
+}
+.ff-header__inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+.ff-nav { display: flex; gap: var(--ff-space-600); }
+.ff-nav a {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--ff-primary);
+}
+.ff-nav a[aria-current] { box-shadow: inset 0 -3px 0 var(--ff-secondary); }
+
+.ff-footer {
+  border-radius: 0 0 var(--ff-radius) var(--ff-radius);
+  background: var(--ff-light);
+  padding-block: var(--ff-space-800);
+}
+.ff-footer__grid {
+  display: grid;
+  gap: var(--ff-space-700) var(--ff-space-700);
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+.ff-footer h3 { color: var(--ff-secondary); font-size: var(--ff-text-h4); font-weight: 400; margin: 0 0 var(--ff-space-300); }
+.ff-footer ul { margin: 0; padding: 0; list-style: none; }
+.ff-footer li + li { margin-top: var(--ff-space-200); }
+.ff-footer__info { color: var(--ff-yellow); margin-top: var(--ff-space-700); }
