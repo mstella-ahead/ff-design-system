@@ -2,6 +2,8 @@
 # markup and photography; this repo ships the distilled system, not the source.
 raw/
 raw-mobile/
+raw-tablet/
+raw-laptop/
 
 # Dependencies + build output.
 node_modules/

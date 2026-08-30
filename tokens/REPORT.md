@@ -1,6 +1,6 @@
 # FormFactor tokens — analysis report
 
-Generated: 2026-08-30T18:52:22.999Z
+Generated: 2026-08-30T19:04:10.344Z
 Source: 15 pages under `raw/`
 
 ## How to read this report
@@ -291,6 +291,95 @@ Long tail (23 rare / off-scale values, flagged not tokenized): 1, 2, 3, 9, 11, 2
 
 - Compound / per-corner: `30px 30px 0px 0px` (15×) — `a.[` 15
 - Compound / per-corner: `0px 0px 30px 30px` (2×) — `div.footer` 2
+
+## Responsive
+
+Captured at 4 widths: **390px** (`raw-mobile/`, base), **768px** (`raw-tablet/`, tablet), **1280px** (`raw-laptop/`, desktop), **1440px** (`raw/`, wide).
+
+### FormFactor's breakpoints
+
+Read off the theme's own utility-class suffixes, not inferred from a viewport diff. `formfactor-2022` ships `.flow-space-400`, `-400-t`, `-400-sd` and `-400-hd`, and each suffixed variant lives inside exactly one media query — so these are the breakpoints the theme itself names.
+
+
+| Token | Min width | Suffix | Band | Sampled |
+|---|---:|---|---|---|
+| `breakpoint.base` | 0px | _(none)_ | mobile base | 390px |
+| `breakpoint.tablet` | 480px | `-t` | tablet | 768px |
+| `breakpoint.desktop` | 1024px | `-sd` | small desktop | 1280px |
+| `breakpoint.wide` | 1435px | `-hd` | large desktop | 1440px |
+
+The CSS contains 11 distinct `min-width` values, but only these four are FormFactor's. The other seven (576, 601, 768, 769, 783, 992, 1168, 1200) come from Bootstrap, WordPress core and plugins, and must not become tokens.
+
+### Authored vars that change with viewport
+
+**7** of the authored vars resolve differently across widths. These are the real responsive tokens.
+
+
+| Var | 390px | 768px | 1280px | 1440px |
+|---|---|---|---|---|
+| `--border-radius` | `20px` | `30px` | `30px` | `30px` |
+| `--footer-body-column-gap` | `40px` | `40px` | `40px` | `calc( 1 * 2.36 * 1rem )` |
+| `--footer-body-row-gap` | `38px` | `38px` | `38px` | `calc( 1 * 3.15 * 1rem )` |
+| `--logo-width` | `224px` | `280px` | `280px` | `340px` |
+| `--mega-menu-section-b` | `265px` | `265px` | `280px` | `280px` |
+| `--product-image-height` | `150px` | `178px` | `150px` | `242px` |
+| `--wrapper-max-width` | `65rem` | `65rem` | `calc( 958px + 1 * 1.33 * 2rem )` | `calc( 1390px + 1 * 1.33 * 2rem )` |
+
+The headline one is `--border-radius`: **20px below 480px, 30px everywhere above**. Because the theme applies it through a single `.radius { border-radius: var(--border-radius) }` utility, every card and button becomes responsive for free — there is no per-component media query to maintain.
+
+Two of these are worth flagging rather than tokenizing as-is:
+
+- **`--wrapper-max-width` dips at `-sd`.** Three authored declarations exist: `65rem` (1040px), `calc(958px + var(--size-500) * 2rem)` (~1001px) and `calc(1390px + …)` (~1433px). So the container is *narrower* at 1280px than at 768px. That is almost certainly unintended, and a prototype should not reproduce it — treat ~1000px as a floor, not a design intent.
+- **`--product-image-height` is non-monotonic**: 150px at 390, 178px at 768, back to 150px at 1280, then 242px at 1440. Three authored values (150/178/242) reached through overlapping queries. Drift, not a scale.
+
+### Responsive type scale
+
+Heading sizes per viewport (distinct values observed, px). Color does not change with viewport — only size.
+
+
+| Tag | 390px | 768px | 1280px | 1440px |
+|---|---|---|---|---|
+| `h1` | 37.8 | 50.4, 37.8 | 50.4, 37.8 | 67.2, 37.8 |
+| `h2` | 34, 25.5 | 37.8, 24.5 | 37.8, 24.5 | 45.3, 30 |
+| `h3` | 25.5, 21.3, 19.2, 18 | 24.5, 21.3, 19.2, 18 | 24.5, 21.3, 19.2, 18 | 30, 28.3, 24.7, 18 |
+| `h4` | 21.3 | 21.3 | 21.3 | 24.7 |
+
+The scale is authored as a per-level multiplier on the modular scale, escalating a step or two per breakpoint. From the theme CSS:
+
+```css
+/* base (mobile) */
+h1 { font-size: calc( var(--size-700) * 1rem   ) }  /* 37.8px */
+h2 { font-size: calc( var(--size-600) * 1.2rem ) }  /* 34.0px */
+h3 { font-size: calc( var(--size-500) * 1.2rem ) }  /* 25.5px */
+h4 { font-size: calc( var(--size-500) * 1rem   ) }  /* 21.3px */
+
+/* escalating at -t / -sd / -hd */
+h1 { font-size: calc( var(--size-800) * 1rem   ) }  /* 50.4px */
+h1 { font-size: calc( var(--size-900) * 1rem   ) }  /* 67.2px */
+h2 { font-size: calc( var(--size-700) * 1.2rem ) }  /* 45.3px */
+h3 { font-size: calc( var(--size-600) * 1.06rem) }  /* 30.0px */
+```
+
+So the responsive type scale is not a separate system: it walks the same `--size-*` ladder, one or two rungs at a time.
+
+**The type scale has three effective steps, not four.** 768px and 1280px produce identical heading sizes at every level, so the `-t` and `-sd` bands share one type scale and only `-hd` (1435px) steps up. If you are building a single desktop layout, target `-hd` — that is where the 67.2px hero lives, and anything narrower than 1435px gets the 50.4px h1 instead.
+
+### Layout
+
+
+| Width | Elements | vs widest | Notes |
+|---:|---:|---:|---|
+| 390px | 6101 | -16.3% | mobile base |
+| 768px | 6947 | -4.7% | tablet |
+| 1280px | 7286 | +0.0% | small desktop |
+| 1440px | 7286 | +0.0% | large desktop |
+
+The site **reflows rather than swapping templates**: 1280px and 1440px produce a byte-identical element count, so the `-sd` and `-hd` bands restyle the same markup rather than replacing it. Narrower widths shed elements progressively (-4.7% at tablet, -16.3% at mobile) as decorative and secondary blocks are hidden.
+
+Two structural exceptions:
+
+- **The nav is genuinely swapped, not reflowed.** A separate `.mobile-menu` exists alongside `nav#mega-menu`, with its own white-on-dark drill-down (`.mobile-menu .col .menu-item { color: var(--light) }`, and `.col:not(.col-zero) { display: none }` so only the active column shows). There is also a distinct `.contact-us-button-mobile`. Verified against `raw-mobile/home/screenshot-viewport.png`, which shows a hamburger in place of the five top-level links.
+- **75 pseudo-elements only paint at ≥1024px** (126 at 390/768 vs 201 at 1280/1440), so some decorative rules — including part of the orange-rule treatment — are desktop-only.
 
 ## Shadows
 

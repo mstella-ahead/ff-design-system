@@ -12,7 +12,7 @@ import { promises as fs } from 'fs';
 import * as path from 'path';
 
 const TOKENS_DIR = path.resolve('tokens');
-const FILES = ['color.json', 'typography.json', 'spacing.json', 'radius.json', 'shadow.json'];
+const FILES = ['color.json', 'typography.json', 'spacing.json', 'radius.json', 'shadow.json', 'breakpoints.json'];
 
 type Json = { [k: string]: unknown };
 

@@ -25,18 +25,23 @@ Observed **124** time(s) across **15** page(s).
 
 ## Rules and gotchas
 
-- **All heading levels are teal `--secondary` (#00a0af), not navy.** Observed: h1 67.2px, h2 45.3px, h3 30.0px, h4 24.7px — every one teal, weight 400.
-- Only h1 (67.2px = `--size-900`) maps cleanly onto the authored `--size-*` scale; h2/h3/h4 do not.
-- Weight is 400, not bold. The size carries the hierarchy, not the weight.
+- **Teal `--secondary` is the default heading color, but it is not universal — the level matters.** Measured across the crawl: `h1` is teal in **14/14** instances (an absolute rule); `h2` is teal 32 / white 7 (white only on dark bands) and never navy; `h3` is teal 41 / navy 33; `h4` is navy 12 / teal 4 / grey 3.
+- **The navy ones are card titles.** Every navy `h3.heading`/`h4.heading` sits inside a card or CTA item (`li.cta-card`, `ul.cta-grid`, `article.featured-post`), and most are wrapped in an `<a>` — so they inherit the anchor's navy link color rather than being recolored deliberately. Rule of thumb: a heading that *is* the clickable title of a card renders navy; a heading that labels a section renders teal.
+- Weight is 400 at every level — the size carries the hierarchy, not the weight.
+- Heading color does not change responsively; only size does. The colors above are identical at 1440px and 390px.
+- Sizes come from the modular scale with a per-level multiplier, e.g. base `h2 { font-size: calc(var(--size-600) * 1.2rem) }`, escalating a step or two at each breakpoint. See the responsive section of `../tokens/REPORT.md`.
 
 ## Canonical markup
 
 Real theme class names, so a prototype inherits the theme CSS. Imagery is a placeholder — FormFactor's own photography and logos are never redistributed from this repo.
 
 ```html
-<h1 class="page-header__heading">Page title</h1>   <!-- 67.2px teal -->
-<h2>Section heading</h2>                            <!-- 45.3px teal -->
-<h3 class="font-base">Subsection</h3>               <!-- 30.0px teal -->
+<h1 class="page-header__heading">Page title</h1>  <!-- 67.2px teal, always -->
+<h2>Section heading</h2>                           <!-- 45.3px teal -->
+<h3>Subsection</h3>                                <!-- 30.0px teal -->
+
+<!-- Inside a card the title is a link, so it reads navy: -->
+<li class="cta-card"><a href="/x"><h4 class="heading">Card title</h4></a></li>
 ```
 
 ## Observed instance

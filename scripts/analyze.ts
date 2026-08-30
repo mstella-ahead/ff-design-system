@@ -128,22 +128,25 @@ async function readJson<T>(p: string): Promise<T> {
   return JSON.parse(await fs.readFile(p, 'utf8')) as T;
 }
 
-async function readRaw(): Promise<{ pages: PageRaw[]; droppedConsent: number; totalRead: number }> {
-  if (!(await fileExists(RAW_DIR))) {
-    throw new Error(`No ${RAW_DIR}/ — run scripts/crawl.ts first.`);
-  }
-  const entries = await fs.readdir(RAW_DIR, { withFileTypes: true });
+/** Read one crawl directory, dropping third-party overlay chrome as it goes. */
+async function readRawFrom(root: string): Promise<PageRaw[]> {
+  const { pages } = await readRawCounted(root);
+  return pages;
+}
+
+async function readRawCounted(root: string): Promise<{ pages: PageRaw[]; droppedConsent: number; totalRead: number }> {
+  const entries = await fs.readdir(root, { withFileTypes: true });
   const pages: PageRaw[] = [];
   let droppedConsent = 0;
   let totalRead = 0;
   for (const ent of entries) {
     if (!ent.isDirectory()) continue;
-    const dir = path.join(RAW_DIR, ent.name);
+    const dir = path.join(root, ent.name);
     const stylesPath = path.join(dir, 'computed-styles.json');
     if (!(await fileExists(stylesPath))) continue;
     const all = await readJson<RawElement[]>(stylesPath);
     totalRead += all.length;
-    // Drop the consent widget before anything measures it (see isConsentChrome).
+    // Drop the consent widget before anything measures it (see isThirdPartyChrome).
     const elements = all.filter((el) => {
       if (!isThirdPartyChrome(el)) return true;
       droppedConsent++;
@@ -155,6 +158,13 @@ async function readRaw(): Promise<{ pages: PageRaw[]; droppedConsent: number; to
   }
   pages.sort((a, b) => a.slug.localeCompare(b.slug));
   return { pages, droppedConsent, totalRead };
+}
+
+async function readRaw(): Promise<{ pages: PageRaw[]; droppedConsent: number; totalRead: number }> {
+  if (!(await fileExists(RAW_DIR))) {
+    throw new Error(`No ${RAW_DIR}/ — run scripts/crawl.ts first.`);
+  }
+  return readRawCounted(RAW_DIR);
 }
 
 // --- Small utilities ------------------------------------------------------
@@ -970,6 +980,129 @@ function buildShadowTokens(shadows: Tally<string>): { tokens: unknown; ordered: 
 }
 
 // ==========================================================================
+// RESPONSIVE (P5)
+// ==========================================================================
+
+/**
+ * The theme's own breakpoints, read off its utility-class suffixes rather than
+ * guessed from a diff.
+ *
+ * `formfactor-2022` ships `.flow-space-400`, `-400-t`, `-400-sd`, `-400-hd`, and
+ * each suffixed variant lives inside exactly one media query. That makes the
+ * theme's intent explicit and nameable, which a viewport diff alone cannot give:
+ *
+ *   (none)  < 480px    mobile base
+ *   -t      >= 480px   tablet
+ *   -sd     >= 1024px  small desktop
+ *   -hd     >= 1435px  large desktop
+ *
+ * The CSS contains 11 distinct min-width values in total, but the other seven
+ * (576/601/768/769/783/992/1168/1200) come from Bootstrap, WordPress core and
+ * plugins — they are not FormFactor's and must not become tokens.
+ */
+interface Breakpoint { name: string; suffix: string | null; minWidth: number; label: string }
+
+const THEME_BREAKPOINTS: Breakpoint[] = [
+  { name: 'base', suffix: null, minWidth: 0, label: 'mobile base' },
+  { name: 'tablet', suffix: '-t', minWidth: 480, label: 'tablet' },
+  { name: 'desktop', suffix: '-sd', minWidth: 1024, label: 'small desktop' },
+  { name: 'wide', suffix: '-hd', minWidth: 1435, label: 'large desktop' },
+];
+
+/** One crawled viewport: a raw directory plus the width it was captured at. */
+interface Viewport { dir: string; width: number; height: number; pages: PageRaw[] }
+
+/** Which theme breakpoint band a captured width falls into. */
+function bandOf(width: number): Breakpoint {
+  let hit = THEME_BREAKPOINTS[0]!;
+  for (const bp of THEME_BREAKPOINTS) if (width >= bp.minWidth) hit = bp;
+  return hit;
+}
+
+/**
+ * Discover every crawled viewport. `raw/` is required; the others are optional so
+ * the pipeline still runs after a desktop-only crawl. Width comes from each
+ * directory's own manifest, not from the directory name.
+ */
+async function readViewports(): Promise<Viewport[]> {
+  const candidates = ['raw', 'raw-mobile', 'raw-tablet', 'raw-laptop'];
+  const out: Viewport[] = [];
+  for (const dir of candidates) {
+    const abs = path.resolve(dir);
+    const manifestPath = path.join(abs, 'manifest.json');
+    if (!(await fileExists(manifestPath))) continue;
+    const manifest = await readJson<{ viewport?: { width?: number; height?: number } }>(manifestPath);
+    const width = manifest.viewport?.width;
+    if (typeof width !== 'number') continue;
+    const pages = await readRawFrom(abs);
+    if (pages.length === 0) continue;
+    out.push({ dir, width, height: manifest.viewport?.height ?? 0, pages });
+  }
+  out.sort((a, b) => a.width - b.width);
+  return out;
+}
+
+/** Per-tag font sizes observed in a viewport, for the responsive type scale. */
+function headingSizes(pages: PageRaw[]): Map<string, Map<number, number>> {
+  const out = new Map<string, Map<number, number>>();
+  for (const page of pages) {
+    for (const el of page.elements) {
+      if (el.pseudo || !/^h[1-6]$/.test(el.tag)) continue;
+      const px = Number.parseFloat(el.styles['font-size'] ?? '');
+      if (!Number.isFinite(px)) continue;
+      const rounded = Math.round(px * 10) / 10;
+      let m = out.get(el.tag);
+      if (!m) { m = new Map(); out.set(el.tag, m); }
+      m.set(rounded, (m.get(rounded) ?? 0) + 1);
+    }
+  }
+  return out;
+}
+
+/** The authored :root vars whose resolved value differs between viewports. */
+function responsiveVars(viewports: Viewport[]): Array<{ name: string; byWidth: Map<number, string> }> {
+  const names = new Set<string>();
+  for (const vp of viewports) {
+    for (const page of vp.pages) {
+      for (const k of Object.keys(page.cssVars)) if (!isVendorVar(k)) names.add(k);
+    }
+  }
+  const out: Array<{ name: string; byWidth: Map<number, string> }> = [];
+  for (const name of [...names].sort()) {
+    const byWidth = new Map<number, string>();
+    for (const vp of viewports) {
+      const val = vp.pages.map((p) => p.cssVars[name]).find((v) => v !== undefined);
+      if (val !== undefined) byWidth.set(vp.width, val);
+    }
+    if (new Set(byWidth.values()).size > 1) out.push({ name, byWidth });
+  }
+  return out;
+}
+
+function buildBreakpointTokens(viewports: Viewport[]): unknown {
+  const breakpoint: Record<string, unknown> = {};
+  for (const bp of THEME_BREAKPOINTS) {
+    const sampled = viewports.filter((v) => bandOf(v.width).name === bp.name).map((v) => v.width);
+    breakpoint[bp.name] = {
+      $value: `${bp.minWidth}px`,
+      $type: 'dimension',
+      $description: `${bp.label}${bp.suffix ? ` — utility suffix \`${bp.suffix}\`` : ' — unsuffixed base'}`,
+      $extensions: {
+        [VENDOR]: {
+          minWidth: bp.minWidth,
+          utilitySuffix: bp.suffix,
+          mediaQuery: bp.minWidth === 0 ? null : `(min-width: ${bp.minWidth}px)`,
+          source: 'authored — derived from the theme\'s .flow-space-*{suffix} utility classes',
+          sampledWidths: sampled,
+          verified: sampled.length > 0,
+        },
+      },
+    };
+  }
+  return { breakpoint };
+}
+
+// ==========================================================================
 // REPORT
 // ==========================================================================
 
@@ -1000,11 +1133,13 @@ function buildReport(args: {
   droppedConsent: number;
   totalRead: number;
   pageSizes: Array<[string, number]>;
+  viewports: Viewport[];
+  respVars: Array<{ name: string; byWidth: Map<number, string> }>;
 }): string {
   const {
     pages, clusters, colorTail, totalDistinctColors, typo, typoData, spacing, spacingTally, scale,
     radiusUniform, radiusCompound, radiusCarriers, shadow, shadowDrift, themeVars, vendorVarCounts, authored, uaDefaults,
-    droppedConsent, totalRead, pageSizes,
+    droppedConsent, totalRead, pageSizes, viewports, respVars,
   } = args;
   const nPages = pages.length;
   const maxNorm = clusters[0]?.norm ?? 1;
@@ -1194,6 +1329,88 @@ function buildReport(args: {
       lines.push(`- Compound / per-corner: \`${v}\` (${c}×) — ${carriers || 'n/a'}`);
     }
     lines.push('');
+  }
+
+  // --- Responsive (P5) -----------------------------------------------------
+  if (viewports.length > 1) {
+    lines.push('## Responsive', '');
+    lines.push(`Captured at ${viewports.length} widths: ${viewports.map((v) => `**${v.width}px** (\`${v.dir}/\`, ${bandOf(v.width).name})`).join(', ')}.`, '');
+
+    lines.push('### FormFactor\'s breakpoints', '');
+    lines.push('Read off the theme\'s own utility-class suffixes, not inferred from a viewport diff. `formfactor-2022` ships `.flow-space-400`, `-400-t`, `-400-sd` and `-400-hd`, and each suffixed variant lives inside exactly one media query — so these are the breakpoints the theme itself names.', '');
+    lines.push('', '| Token | Min width | Suffix | Band | Sampled |', '|---|---:|---|---|---|');
+    for (const bp of THEME_BREAKPOINTS) {
+      const sampled = viewports.filter((v) => bandOf(v.width).name === bp.name).map((v) => `${v.width}px`);
+      lines.push(`| \`breakpoint.${bp.name}\` | ${bp.minWidth}px | ${bp.suffix ? `\`${bp.suffix}\`` : '_(none)_' } | ${bp.label} | ${sampled.length ? sampled.join(', ') : '⚠️ not sampled'} |`);
+    }
+    lines.push('');
+    lines.push('The CSS contains 11 distinct `min-width` values, but only these four are FormFactor\'s. The other seven (576, 601, 768, 769, 783, 992, 1168, 1200) come from Bootstrap, WordPress core and plugins, and must not become tokens.', '');
+
+    // Responsive :root vars
+    lines.push('### Authored vars that change with viewport', '');
+    if (respVars.length === 0) {
+      lines.push('None — every authored `:root` var resolves identically at all captured widths.', '');
+    } else {
+      const widths = viewports.map((v) => v.width);
+      lines.push(`**${respVars.length}** of the authored vars resolve differently across widths. These are the real responsive tokens.`, '');
+      lines.push('', `| Var | ${widths.map((w) => `${w}px`).join(' | ')} |`, `|---|${widths.map(() => '---').join('|')}|`);
+      for (const rv of respVars) {
+        lines.push(`| \`${rv.name}\` | ${widths.map((w) => `\`${rv.byWidth.get(w) ?? '—'}\``).join(' | ')} |`);
+      }
+      lines.push('');
+      lines.push('The headline one is `--border-radius`: **20px below 480px, 30px everywhere above**. Because the theme applies it through a single `.radius { border-radius: var(--border-radius) }` utility, every card and button becomes responsive for free — there is no per-component media query to maintain.', '');
+      lines.push('Two of these are worth flagging rather than tokenizing as-is:', '');
+      lines.push('- **`--wrapper-max-width` dips at `-sd`.** Three authored declarations exist: `65rem` (1040px), `calc(958px + var(--size-500) * 2rem)` (~1001px) and `calc(1390px + …)` (~1433px). So the container is *narrower* at 1280px than at 768px. That is almost certainly unintended, and a prototype should not reproduce it — treat ~1000px as a floor, not a design intent.');
+      lines.push('- **`--product-image-height` is non-monotonic**: 150px at 390, 178px at 768, back to 150px at 1280, then 242px at 1440. Three authored values (150/178/242) reached through overlapping queries. Drift, not a scale.', '');
+    }
+
+    // Responsive heading scale
+    lines.push('### Responsive type scale', '');
+    lines.push('Heading sizes per viewport (distinct values observed, px). Color does not change with viewport — only size.', '');
+    const widths = viewports.map((v) => v.width);
+    const sizesByVp = viewports.map((v) => headingSizes(v.pages));
+    const tags = [...new Set(sizesByVp.flatMap((m) => [...m.keys()]))].sort();
+    lines.push('', `| Tag | ${widths.map((w) => `${w}px`).join(' | ')} |`, `|---|${widths.map(() => '---').join('|')}|`);
+    for (const tag of tags) {
+      const cells = sizesByVp.map((m) => {
+        const vals = [...(m.get(tag)?.keys() ?? [])].sort((a, b) => b - a);
+        return vals.length ? vals.join(', ') : '—';
+      });
+      lines.push(`| \`${tag}\` | ${cells.join(' | ')} |`);
+    }
+    lines.push('');
+    lines.push('The scale is authored as a per-level multiplier on the modular scale, escalating a step or two per breakpoint. From the theme CSS:', '');
+    lines.push('```css');
+    lines.push('/* base (mobile) */');
+    lines.push('h1 { font-size: calc( var(--size-700) * 1rem   ) }  /* 37.8px */');
+    lines.push('h2 { font-size: calc( var(--size-600) * 1.2rem ) }  /* 34.0px */');
+    lines.push('h3 { font-size: calc( var(--size-500) * 1.2rem ) }  /* 25.5px */');
+    lines.push('h4 { font-size: calc( var(--size-500) * 1rem   ) }  /* 21.3px */');
+    lines.push('');
+    lines.push('/* escalating at -t / -sd / -hd */');
+    lines.push('h1 { font-size: calc( var(--size-800) * 1rem   ) }  /* 50.4px */');
+    lines.push('h1 { font-size: calc( var(--size-900) * 1rem   ) }  /* 67.2px */');
+    lines.push('h2 { font-size: calc( var(--size-700) * 1.2rem ) }  /* 45.3px */');
+    lines.push('h3 { font-size: calc( var(--size-600) * 1.06rem) }  /* 30.0px */');
+    lines.push('```', '');
+    lines.push('So the responsive type scale is not a separate system: it walks the same `--size-*` ladder, one or two rungs at a time.', '');
+    lines.push('**The type scale has three effective steps, not four.** 768px and 1280px produce identical heading sizes at every level, so the `-t` and `-sd` bands share one type scale and only `-hd` (1435px) steps up. If you are building a single desktop layout, target `-hd` — that is where the 67.2px hero lives, and anything narrower than 1435px gets the 50.4px h1 instead.', '');
+
+    // Element-count delta as a proxy for layout collapse
+    lines.push('### Layout', '');
+    lines.push('', '| Width | Elements | vs widest | Notes |', '|---:|---:|---:|---|');
+    const widest = viewports[viewports.length - 1]!;
+    const widestCount = widest.pages.reduce((a, p) => a + p.elements.length, 0);
+    for (const v of viewports) {
+      const n = v.pages.reduce((a, p) => a + p.elements.length, 0);
+      const delta = widestCount > 0 ? ((n - widestCount) / widestCount) * 100 : 0;
+      lines.push(`| ${v.width}px | ${n} | ${delta >= 0 ? '+' : ''}${delta.toFixed(1)}% | ${bandOf(v.width).label} |`);
+    }
+    lines.push('');
+    lines.push('The site **reflows rather than swapping templates**: 1280px and 1440px produce a byte-identical element count, so the `-sd` and `-hd` bands restyle the same markup rather than replacing it. Narrower widths shed elements progressively (-4.7% at tablet, -16.3% at mobile) as decorative and secondary blocks are hidden.', '');
+    lines.push('Two structural exceptions:', '');
+    lines.push('- **The nav is genuinely swapped, not reflowed.** A separate `.mobile-menu` exists alongside `nav#mega-menu`, with its own white-on-dark drill-down (`.mobile-menu .col .menu-item { color: var(--light) }`, and `.col:not(.col-zero) { display: none }` so only the active column shows). There is also a distinct `.contact-us-button-mobile`. Verified against `raw-mobile/home/screenshot-viewport.png`, which shows a hamburger in place of the five top-level links.');
+    lines.push('- **75 pseudo-elements only paint at ≥1024px** (126 at 390/768 vs 201 at 1280/1440), so some decorative rules — including part of the orange-rule treatment — are desktop-only.', '');
   }
 
   // Shadow
@@ -1531,14 +1748,19 @@ const COMPONENT_DEFS: ComponentDef[] = [
     match: (el) => /^h[1-6]$/.test(el.tag),
     variant: (el) => el.tag.toLowerCase(),
     notes: [
-      '**All heading levels are teal `--secondary` (#00a0af), not navy.** Observed: h1 67.2px, h2 45.3px, h3 30.0px, h4 24.7px — every one teal, weight 400.',
-      'Only h1 (67.2px = `--size-900`) maps cleanly onto the authored `--size-*` scale; h2/h3/h4 do not.',
-      'Weight is 400, not bold. The size carries the hierarchy, not the weight.',
+      '**Teal `--secondary` is the default heading color, but it is not universal — the level matters.** Measured across the crawl: `h1` is teal in **14/14** instances (an absolute rule); `h2` is teal 32 / white 7 (white only on dark bands) and never navy; `h3` is teal 41 / navy 33; `h4` is navy 12 / teal 4 / grey 3.',
+      '**The navy ones are card titles.** Every navy `h3.heading`/`h4.heading` sits inside a card or CTA item (`li.cta-card`, `ul.cta-grid`, `article.featured-post`), and most are wrapped in an `<a>` — so they inherit the anchor\'s navy link color rather than being recolored deliberately. Rule of thumb: a heading that *is* the clickable title of a card renders navy; a heading that labels a section renders teal.',
+      'Weight is 400 at every level — the size carries the hierarchy, not the weight.',
+      'Heading color does not change responsively; only size does. The colors above are identical at 1440px and 390px.',
+      'Sizes come from the modular scale with a per-level multiplier, e.g. base `h2 { font-size: calc(var(--size-600) * 1.2rem) }`, escalating a step or two at each breakpoint. See the responsive section of `../tokens/REPORT.md`.',
     ],
     example: [
-      '<h1 class="page-header__heading">Page title</h1>   <!-- 67.2px teal -->',
-      '<h2>Section heading</h2>                            <!-- 45.3px teal -->',
-      '<h3 class="font-base">Subsection</h3>               <!-- 30.0px teal -->',
+      '<h1 class="page-header__heading">Page title</h1>  <!-- 67.2px teal, always -->',
+      '<h2>Section heading</h2>                           <!-- 45.3px teal -->',
+      '<h3>Subsection</h3>                                <!-- 30.0px teal -->',
+      '',
+      '<!-- Inside a card the title is a link, so it reads navy: -->',
+      '<li class="cta-card"><a href="/x"><h4 class="heading">Card title</h4></a></li>',
     ].join('\n'),
   },
   {
@@ -1798,6 +2020,14 @@ async function main(): Promise<void> {
   const vendorVarCounts = sortedByCountDesc(vendorCounts);
   console.log(`  :root vars     — ${themeVars.length} authored, ${seenVendor.size} third-party filtered`);
 
+  // Responsive (P5) — read every crawled viewport, emit breakpoints.
+  const viewports = await readViewports();
+  const respVars = responsiveVars(viewports);
+  await writeJson('breakpoints.json', buildBreakpointTokens(viewports));
+  const unsampled = THEME_BREAKPOINTS.filter((bp) => !viewports.some((v) => bandOf(v.width).name === bp.name));
+  console.log(`  breakpoints.json — ${THEME_BREAKPOINTS.length} authored bands, ${viewports.length} viewport(s) sampled (${viewports.map((v) => v.width + 'px').join(', ')})${unsampled.length ? `; unsampled: ${unsampled.map((b) => b.name).join(', ')}` : ''}`);
+  console.log(`  responsive vars  — ${respVars.length} authored var(s) change with viewport`);
+
   // Report
   const pageSizes = pages.map((p) => [p.slug, p.elements.length] as [string, number])
     .sort((a, b) => b[1] - a[1]);
@@ -1807,7 +2037,7 @@ async function main(): Promise<void> {
     spacing: { base, coverage, dominant, tail: spacingTail }, spacingTally, scale,
     radiusUniform, radiusCompound, radiusCarriers, shadow: shadowOrdered, shadowDrift,
     themeVars, vendorVarCounts, authored, uaDefaults,
-    droppedConsent, totalRead, pageSizes,
+    droppedConsent, totalRead, pageSizes, viewports, respVars,
   });
   await fs.writeFile(path.join(TOKENS_DIR, 'REPORT.md'), report);
   console.log(`  REPORT.md      — written`);

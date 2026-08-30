@@ -1,0 +1,72 @@
+{
+  "breakpoint": {
+    "base": {
+      "$value": "0px",
+      "$type": "dimension",
+      "$description": "mobile base — unsuffixed base",
+      "$extensions": {
+        "com.formfactor.www": {
+          "minWidth": 0,
+          "utilitySuffix": null,
+          "mediaQuery": null,
+          "source": "authored — derived from the theme's .flow-space-*{suffix} utility classes",
+          "sampledWidths": [
+            390
+          ],
+          "verified": true
+        }
+      }
+    },
+    "tablet": {
+      "$value": "480px",
+      "$type": "dimension",
+      "$description": "tablet — utility suffix `-t`",
+      "$extensions": {
+        "com.formfactor.www": {
+          "minWidth": 480,
+          "utilitySuffix": "-t",
+          "mediaQuery": "(min-width: 480px)",
+          "source": "authored — derived from the theme's .flow-space-*{suffix} utility classes",
+          "sampledWidths": [
+            768
+          ],
+          "verified": true
+        }
+      }
+    },
+    "desktop": {
+      "$value": "1024px",
+      "$type": "dimension",
+      "$description": "small desktop — utility suffix `-sd`",
+      "$extensions": {
+        "com.formfactor.www": {
+          "minWidth": 1024,
+          "utilitySuffix": "-sd",
+          "mediaQuery": "(min-width: 1024px)",
+          "source": "authored — derived from the theme's .flow-space-*{suffix} utility classes",
+          "sampledWidths": [
+            1280
+          ],
+          "verified": true
+        }
+      }
+    },
+    "wide": {
+      "$value": "1435px",
+      "$type": "dimension",
+      "$description": "large desktop — utility suffix `-hd`",
+      "$extensions": {
+        "com.formfactor.www": {
+          "minWidth": 1435,
+          "utilitySuffix": "-hd",
+          "mediaQuery": "(min-width: 1435px)",
+          "source": "authored — derived from the theme's .flow-space-*{suffix} utility classes",
+          "sampledWidths": [
+            1440
+          ],
+          "verified": true
+        }
+      }
+    }
+  }
+}

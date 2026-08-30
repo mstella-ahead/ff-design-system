@@ -372,10 +372,24 @@ most-representative observed instance with a screenshot region.
 
 This supersedes the two-tone hypothesis in the P6 notes below.
 
-**Every heading level is teal `--secondary`, weight 400.** Observed h1 67.2px (13
-templates), h2 45.3px (31), h3 30.0px (40), h4 24.7px (4) — every one teal.
-Navy `--primary` is *never* a heading: it is links (955 anchors), nav (74), tabs
-(35), icons and UI labels. Body copy is warm grey `--dark-grey` (4104 text uses).
+~~Every heading level is teal.~~ **Corrected in P5** — that claim came from a
+query that only counted headings *which were already teal*, so it could not see
+the counter-examples. Measured properly, over all headings:
+
+| Level | Teal | Navy | Other | Rule |
+|---|---:|---:|---|---|
+| h1 | **14** | 0 | — | absolute: always teal |
+| h2 | **32** | 0 | white 7 (on dark) | teal, inverse on dark bands |
+| h3 | 41 | **33** | grey 9 | mixed — depends on context |
+| h4 | 4 | **12** | grey 3, white 1 | usually navy |
+
+The resolving rule: **teal is the default heading color, and a heading that is
+itself a link renders navy by inheritance.** Every navy `h3.heading`/`h4.heading`
+sits inside a card or CTA item (`li.cta-card`, `ul.cta-grid`,
+`article.featured-post`) and is wrapped in an `<a>`; one confirmed source rule is
+`.product-family-card__product .product-name { color: var(--primary) }`. So a
+heading that *labels* a section is teal; a heading that *is* a clickable card
+title is navy. Body copy is warm grey `--dark-grey` (4104 text uses).
 
 So the color system is role-based and unusually disciplined:
 
@@ -389,10 +403,24 @@ So the color system is role-based and unusually disciplined:
 | `--orange` | the 4px rule under every hero (pseudo-element) |
 | `--yellow` | footer accent |
 
-**The two-tone heading does not repeat.** `h1` is teal on all 13 templates that
-have one, but only the homepage splits its sentence with a navy `<span>`. The
-site-wide rule is the simpler and stronger one: *the page title is always teal at
-`--size-900`*.
+**Two-tone headings are real but narrow** — narrower than CLAUDE.md's original
+hypothesis (a site-wide signature) and broader than P4's first answer
+(homepage-only). Resolved in P5 by finding every `<span>` nested in a heading
+whose color differs from its parent's. Three genuine instances, on 2 of 15
+templates, always *teal lead + navy emphasis*:
+
+| Where | Element |
+|---|---|
+| Homepage hero | `h1.homepage-header__heading > span` |
+| Homepage CTA panel | `h2 > span` in `.cta-box__heading` (2 spans) |
+| Products category | `h3.category-heading > span` |
+
+The apparent hits on `blog` and `company-news-events-press-releases` (10 and 25
+navy spans in headings) are **not** two-tone: they are
+`h3.year-tab > a.tab-link > span`, i.e. the link-inheritance rule above.
+
+So the site-wide rule remains the simpler one — *the page title is always teal* —
+with two-tone as a deliberate emphasis device used sparingly on landing pages.
 
 ### Composition system (feeds P6)
 
@@ -438,6 +466,81 @@ Recorded rather than invented:
   one industry page). The product detail page has none. CLAUDE.md predicted both;
   the data says no.
 
+## What P5 established (2026-08-30)
+
+### Four viewports, because the theme has four bands
+
+The breakpoints are **read off the theme's own utility-class suffixes**, not
+inferred from a viewport diff — `.flow-space-400`, `-400-t`, `-400-sd`, `-400-hd`
+each live inside exactly one media query, so the theme names its own bands:
+
+| Token | Min width | Suffix | Sampled |
+|---|---:|---|---|
+| `breakpoint.base` | 0 | _(none)_ | 390px (`raw-mobile/`) |
+| `breakpoint.tablet` | 480 | `-t` | 768px (`raw-tablet/`) |
+| `breakpoint.desktop` | 1024 | `-sd` | 1280px (`raw-laptop/`) |
+| `breakpoint.wide` | 1435 | `-hd` | 1440px (`raw/`) |
+
+The CSS holds 11 distinct `min-width` values; the other seven
+(576/601/768/769/783/992/1168/1200) are Bootstrap, WordPress core and plugins and
+must not become tokens. Note 1440px sits only 5px above `-hd`.
+
+The two extra crawls were worth it — both findings below are invisible from a
+390/1440 diff alone.
+
+### The type scale has three effective steps, not four
+
+768px and 1280px produce **identical** heading sizes at every level, so `-t` and
+`-sd` share one type scale and only `-hd` steps up:
+
+| Tag | 390 | 768 / 1280 | 1440 |
+|---|---|---|---|
+| h1 | 37.8 | 50.4 | **67.2** |
+| h2 | 34.0 | 37.8 | 45.3 |
+| h3 | 25.5 | 24.5 | 30.0 |
+| h4 | 21.3 | 21.3 | 24.7 |
+
+**Practical consequence: if you build one desktop layout, target `-hd`.** The
+67.2px hero only exists at ≥1435px; anything narrower gets 50.4px.
+
+And the responsive type scale is not a separate system — it walks the same
+`--size-*` ladder one or two rungs at a time. Base is
+`h1: calc(var(--size-700) * 1rem)`, escalating to `--size-800` then `--size-900`.
+
+### Seven responsive vars, two of which are drift
+
+- **`--border-radius`: 20px below 480px, 30px everywhere above.** Applied through
+  the single `.radius` utility, so every card and button is responsive for free.
+- `--logo-width`: 224 → 280 → 280 → 340.
+- `--mega-menu-section-b` changes at `-sd`; `--footer-body-*-gap` only at `-hd`.
+- **`--wrapper-max-width` dips at `-sd`** — three authored declarations: `65rem`
+  (1040px), `calc(958px + …)` (~1001px), `calc(1390px + …)` (~1433px). The
+  container is *narrower* at 1280px than at 768px. Almost certainly unintended;
+  do not reproduce it.
+- **`--product-image-height` is non-monotonic**: 150 → 178 → 150 → 242, three
+  authored values reached through overlapping queries. Drift, not a scale.
+
+### Layout: reflow, with the nav as a real exception
+
+1280px and 1440px produce a **byte-identical element count** (8546 raw / 7286
+after filtering), so `-sd` and `-hd` restyle the same markup rather than swapping
+templates. Narrower widths shed elements progressively (−4.7% tablet, −16.3%
+mobile) as secondary blocks are hidden.
+
+Two structural exceptions:
+
+- **The nav is genuinely swapped.** `.mobile-menu` exists alongside
+  `nav#mega-menu`, with white-on-dark drill-down navigation
+  (`.mobile-menu .col .menu-item { color: var(--light) }`, and
+  `.col:not(.col-zero) { display: none }` so only the active column shows), plus a
+  separate `.contact-us-button-mobile`. Confirmed against
+  `raw-mobile/home/screenshot-viewport.png` — a hamburger replaces the five links.
+- **75 pseudo-elements only paint at ≥1024px** (126 at 390/768 vs 201 at
+  1280/1440), so some decorative rules are desktop-only.
+
+Heading *color* does not change with viewport at all — only size. And the
+homepage two-tone heading survives to 390px intact.
+
 ## Phases (checkpoint-driven — stop at each for review)
 
 - **P0 — Scaffold + smoke test.** ✅ **DONE.** `npm install`, chromium present,
@@ -472,9 +575,11 @@ Recorded rather than invented:
   before trusting the output. Expect this site to need components the app version
   never had: hero, card grid, spec table, breadcrumb, pull quote, form field,
   footer, CTA band.
-- **P5 — Responsive.** Diff `raw/` vs `raw-mobile/` to derive breakpoints and the
-  responsive type/spacing behavior. Record as `tokens/breakpoints.json` + a
-  section in `REPORT.md`.
+- **P5 — Responsive.** ✅ **DONE** (2026-08-30). `tokens/breakpoints.json` +
+  a Responsive section in `REPORT.md`. Crawled at **four** widths so every one of
+  the theme's own bands is sampled, not just the two extremes:
+  `npm run crawl:tablet` (768) and `npm run crawl:laptop` (1280) were added.
+  `validate:tokens` passes (118 tokens across 6 files). See "What P5 established".
 - **P6 — Finalize.** Write `README.md` as the entry point for the consuming
   agent, in the shape of `~/Code/ahead-design-system`: a short constitution of
   rules that must never break, a composition-pattern library, and an honest-gaps

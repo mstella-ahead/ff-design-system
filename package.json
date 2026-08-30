@@ -7,6 +7,8 @@
   "scripts": {
     "crawl": "tsx scripts/crawl.ts",
     "crawl:mobile": "FF_VIEWPORT=390x844 FF_OUTPUT_DIR=raw-mobile tsx scripts/crawl.ts",
+    "crawl:tablet": "FF_VIEWPORT=768x1024 FF_OUTPUT_DIR=raw-tablet tsx scripts/crawl.ts",
+    "crawl:laptop": "FF_VIEWPORT=1280x800 FF_OUTPUT_DIR=raw-laptop tsx scripts/crawl.ts",
     "analyze": "tsx scripts/analyze.ts",
     "validate:tokens": "tsx scripts/validate-tokens.ts",
     "typecheck": "tsc --noEmit"
