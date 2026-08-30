@@ -122,8 +122,11 @@ Don't re-derive these — they're checked, and a couple of them change the plan:
   freeze transitions so screenshots catch settled state, not a random frame.
 - **Responsive is a first-class concern here** in a way it wasn't for an internal
   app. The desktop pass writes `raw/`; `npm run crawl:mobile` re-runs the same
-  seeds at 390×844 into `raw-mobile/`. Derive breakpoints and the responsive type
-  scale from the delta between the two.
+  seeds at 390×844 into `raw-mobile/`, and P5 added `crawl:tablet` (768×1024) and
+  `crawl:laptop` (1280×800) so all four of the theme's bands are sampled rather
+  than just the two extremes. Derive breakpoints and the responsive type scale
+  from the deltas — but note the breakpoint *values* come from the theme's own
+  utility suffixes, not from the diff.
 - **`raw/` is git-ignored.** It's someone else's markup, copy and photography.
   The repo ships the distilled system + the scripts, never the scrape.
 
@@ -136,8 +139,11 @@ scripts/
   validate-tokens.ts  # sanity check on tokens/ (JSON, $type, alias resolution)
 seeds.txt             # one URL per line — the curated page list, by archetype
 raw/                  # git-ignored — per-page computed styles, css vars, css, png, states
-raw-mobile/           # git-ignored — same, at 390x844
-tokens/               # W3C Design Tokens JSON (color, typography, spacing, radius, shadow) + REPORT.md
+raw-mobile/           # git-ignored — same, at 390x844  (band: base)
+raw-tablet/           # git-ignored — same, at 768x1024 (band: -t)
+raw-laptop/           # git-ignored — same, at 1280x800 (band: -sd)
+tokens/               # W3C Design Tokens JSON (color, typography, spacing, radius,
+                      #   shadow, breakpoints) + REPORT.md
 components/           # one MDX file per component + README.md index
 README.md             # entry point for humans + the consuming agent
 CLAUDE.md             # this file
@@ -599,7 +605,7 @@ homepage two-tone heading survives to 390px intact.
 
 ## Guardrails
 
-- Never commit `raw/` or `raw-mobile/`.
+- Never commit any `raw*/` directory (`raw/`, `raw-mobile/`, `raw-tablet/`, `raw-laptop/`).
 - Don't redistribute FormFactor's logos or photography. Use placeholders
   (e.g. `https://placehold.co/`) in any example markup.
 - Never send scraped CSS/screenshots to third-party analyzers (Project Wallace,
