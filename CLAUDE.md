@@ -157,6 +157,68 @@ CLAUDE.md             # this file
   Surface the histogram — the dominant handful is the real palette; the long tail
   is drift.
 
+## What P2 verified (2026-08-30) — read before P3/P4
+
+The multi-page crawl surfaced five things the single-page smoke test could not.
+Two of them will corrupt the tokens if ignored.
+
+- **⚠️ The CookieYes preference-center stays mounted after the accept click, and
+  it is 13.1% of the entire sample.** This corrects the P1 note above ("leaving
+  it up costs ~11 elements"). Clicking `.cky-btn-accept` hides the *banner*, but
+  `div.cky-modal` / `div.cky-preference-center` remain in the DOM with non-zero
+  rects — **1095 of 8345 captured elements (~73/page)**. The damage is concrete:
+  `rgb(33,33,33)` (`#212121`, CookieYes's own body text) ranks **4th in the raw
+  palette at 885 occurrences and drops to zero** once these elements are
+  excluded. CookieYes also themes itself with FormFactor's teal, inflating
+  `#00a0af` from a true 115 to 175 (+52%), and `#000000` from 15 to 135.
+  **P3 must drop any element whose `classes` or `path` contains `cky`.** Doing it
+  in the analyzer (not the crawler) keeps the raw capture honest and re-filterable.
+- **⚠️ Two paginated listing pages are 50.2% of all elements** — the press-release
+  index (2206) and the blog index (1983) versus a 204-element events page. Raw
+  frequency counts therefore describe *a press-release list item*, not FormFactor.
+  **P3 must drive naming/tiering off page-spread, not raw count** (raw counts stay
+  in `$extensions` for auditability). The existing `pages.size >= 3` core/extended
+  tier is the one signal already robust to this; the spacing 0.5%-of-total
+  threshold, the "most frequent font-size = base" rule and the top-10 `textStyle`
+  combos are all skewed and need normalizing.
+- **The `:root` layer is genuinely stable site-wide.** 173 vars present on all 15
+  pages, **zero** vars whose *value* differs between pages. The 173→175 delta is
+  only `--product-column-gap` + `--product-image-height` on product templates.
+  So authored-name reconciliation in P3 rests on solid ground. Of the 173, 43 are
+  unprefixed; one of those (`--wpdm-font`, WP Download Manager) is still vendor
+  noise, so **42 are the theme's** — add `--wpdm-` to the filter list above.
+- **`nav-item`'s geometry heuristic is broken — replace it with DOM ancestry.**
+  The five real nav links are `nav#mega-menu > div.top-level > a.menu-item` at
+  **h=16** (12px uppercase, no padding), so the `rect.h >= 18` bound excludes all
+  five and the detector's only header hit is `a.site-header__logo` (h=68). Match
+  on `site-header`/`mega-menu` in `path` instead. (Also: the real path has an
+  intervening `div.top-level` that the P0 note omits.)
+- **`card`'s `tag === 'div'` gate misses most cards.** Only 17 hits across 15
+  pages. Rounded block-level elements are dominated by **`article` (59)**, and
+  FormFactor's cards are `article.product-family-card` / `li.cta-card`. Widen to
+  `article`/`li`/`section` and accept background-color as a surface signal, not
+  just border/shadow.
+
+Two P4/P6 hypotheses from CLAUDE.md now have answers:
+
+- **The `link` detector's brand-hex keying is sound.** `#003a63` (`--primary`) is
+  the link color: 1035 of ~1500 anchors. But **445 anchors are `#ffffff`**
+  (footer / hero-on-dark) and the `isBrand` test misses them — an **inverse
+  variant is missing** and should be added in P4. A further 44 anchors sit at
+  `rgb(0,0,238)`, the browser default; these are *wrapper* anchors around images
+  and cards (`a.site-header__logo`, `a.btn-inline` at 421×328, `a.whats-new-link`)
+  whose inherited blue never paints visible text — latent, not visible drift, and
+  not a palette entry.
+- **Geometry is bimodal, so "everything is a pill" is too strong.** Alongside
+  `--border-radius: 30px` the theme also authors `--border-radius-regular: 3px`
+  and `--border-radius-sm: 2px`. Confirm the split in P4 — the likely rule is
+  pill for controls, near-sharp for surfaces.
+- **Two-tone headings confirmed** on the homepage hero: "Semiconductor Test" in
+  teal `--secondary` stacked directly above "and Measurement" in navy
+  `--primary`, one sentence across two colors. Check it across templates in P6.
+- **The modular scale reaches typography, not just spacing.** The hero is 67px =
+  16 × 4.2 = `--size-900` exactly. Desktop shows a tight 13 distinct font sizes.
+
 ## Phases (checkpoint-driven — stop at each for review)
 
 - **P0 — Scaffold + smoke test.** ✅ **DONE.** `npm install`, chromium present,
@@ -167,8 +229,11 @@ CLAUDE.md             # this file
 - **P1 — Single-page extract review.** ✅ **DONE** — findings are in the section
   above. The theme's authored vars are present and separable from the five
   categories of third-party noise. Nothing to redo; start at P2.
-- **P2 — Multi-page crawl** over `seeds.txt`, then the mobile pass. ✅ when
-  `raw/manifest.json` shows 16 ok / 0 failed, and `raw-mobile/` matches.
+- **P2 — Multi-page crawl** over `seeds.txt`, then the mobile pass. ✅ **DONE**
+  (2026-08-30). `seeds.txt` holds **15** URLs, not 16 — the earlier note was
+  wrong. Both passes: **15 ok / 0 failed**, all 6 artifacts on every page
+  (90 files desktop / 90 mobile, 44 MB + 28 MB). Findings that change P3/P4 are
+  in "What P2 verified" above.
 - **P3 — Analyze → tokens.** Cluster colors, derive type + spacing scales, emit
   `tokens/` + `REPORT.md`. **Reconcile against the authored `:root` names** —
   where a cluster matches an authored var, use FormFactor's name. ✅ when the
