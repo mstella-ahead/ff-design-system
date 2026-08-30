@@ -1,0 +1,64 @@
+---
+name: Link
+component: link
+instances: 1593
+variants: 4
+pages: [applications-case-studies, blog, blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever, company-about-us, company-careers-career-opportunities, company-news-events-press-releases, events, home, industries-automotive, press-release-formfactor-introduces-the-evolvity-300-probe-system, product-probe-cards-foundry-logic-apollo, products, products-probe-cards, sales-service-contact-sales, technologies-contact-intelligence]
+---
+
+# Link
+
+Inline and list text links. Navy on light surfaces, white on dark ones.
+
+**When to use:** Use for navigation within body content; use a Button for actions.
+
+Observed **1593** time(s) across **15** page(s).
+
+## Variants
+
+| Variant | Background | Text | Radius | Count | Pages | Example classes |
+|---|---|---|---|---:|---:|---|
+| `default (navy)` | — | `#003a63` (`primary`) | 0px | 976 | 15 | `(a, no class)` |
+| `inverse (on dark)` | — | `#ffffff` (`light`) | 0px | 600 | 15 | `(a, no class)` |
+| `unstyled (UA defa…` | — | `#0000ee` | 0px | 16 | 4 | `whats-new-link` |
+| `#333333` | `#fafafa` | `#333333` (`neutral-800-2`) | 4px | 1 | 1 | `fl-button` |
+
+## Rules and gotchas
+
+- Navy `--primary` on light surfaces (955 instances), white on dark ones (445). Both are legitimate; pick by background.
+- 44 anchors inherit the browser default `#0000ee`. Every one is a *wrapper* anchor around an image or a whole card, so the blue never paints visible text — but do not imitate the pattern.
+
+## Canonical markup
+
+Real theme class names, so a prototype inherits the theme CSS. Imagery is a placeholder — FormFactor's own photography and logos are never redistributed from this repo.
+
+```html
+<a href="/technologies/">Contact intelligence</a>     <!-- navy on light -->
+<div class="dark-band"><a href="/company/">About us</a></div>  <!-- white on dark -->
+```
+
+## Observed instance
+
+The most representative on-canvas instance, for cross-checking against the screenshots.
+
+- **Screenshot:** `raw/applications-case-studies/screenshot.png` — region x:85 y:113 w:86 h:24
+- **Classes:** `(a, no class)`
+- **Key styles:** color rgb(0, 58, 99); background rgba(0, 0, 0, 0); font 16px/400; padding 0px 0px 0px 0px; radius 0px
+
+## Source pages
+
+- `raw/applications-case-studies/`
+- `raw/blog/`
+- `raw/blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever/`
+- `raw/company-about-us/`
+- `raw/company-careers-career-opportunities/`
+- `raw/company-news-events-press-releases/`
+- `raw/events/`
+- `raw/home/`
+- `raw/industries-automotive/`
+- `raw/press-release-formfactor-introduces-the-evolvity-300-probe-system/`
+- `raw/product-probe-cards-foundry-logic-apollo/`
+- `raw/products/`
+- `raw/products-probe-cards/`
+- `raw/sales-service-contact-sales/`
+- `raw/technologies-contact-intelligence/`

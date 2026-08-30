@@ -1,0 +1,66 @@
+---
+name: Heading
+component: heading
+instances: 124
+variants: 4
+pages: [applications-case-studies, blog, blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever, company-about-us, company-careers-career-opportunities, company-news-events-press-releases, events, home, industries-automotive, press-release-formfactor-introduces-the-evolvity-300-probe-system, product-probe-cards-foundry-logic-apollo, products, products-probe-cards, sales-service-contact-sales, technologies-contact-intelligence]
+---
+
+# Heading
+
+Section and page titles. Teal at every level — this is the single strongest brand rule on the site.
+
+**When to use:** Choose the level to match the document outline, never for visual size alone. Do not recolor: h1–h4 are teal --secondary in every template observed.
+
+Observed **124** time(s) across **15** page(s).
+
+## Variants
+
+| Variant | Background | Text | Radius | Count | Pages | Example classes |
+|---|---|---|---|---:|---:|---|
+| `h3` | — | `#003a63` (`primary`) | 0px | 51 | 10 | `product-name` |
+| `h2` | — | `#00a0af` (`secondary`) | 0px | 39 | 8 | `(h2, no class)` |
+| `h4` | — | `#003a63` (`primary`) | 0px | 20 | 4 | `heading` |
+| `h1` | — | `#00a0af` (`secondary`) | 0px | 14 | 14 | `page-header__heading` |
+
+## Rules and gotchas
+
+- **All heading levels are teal `--secondary` (#00a0af), not navy.** Observed: h1 67.2px, h2 45.3px, h3 30.0px, h4 24.7px — every one teal, weight 400.
+- Only h1 (67.2px = `--size-900`) maps cleanly onto the authored `--size-*` scale; h2/h3/h4 do not.
+- Weight is 400, not bold. The size carries the hierarchy, not the weight.
+
+## Canonical markup
+
+Real theme class names, so a prototype inherits the theme CSS. Imagery is a placeholder — FormFactor's own photography and logos are never redistributed from this repo.
+
+```html
+<h1 class="page-header__heading">Page title</h1>   <!-- 67.2px teal -->
+<h2>Section heading</h2>                            <!-- 45.3px teal -->
+<h3 class="font-base">Subsection</h3>               <!-- 30.0px teal -->
+```
+
+## Observed instance
+
+The most representative on-canvas instance, for cross-checking against the screenshots.
+
+- **Screenshot:** `raw/products-probe-cards/screenshot.png` — region x:525 y:1112 w:421 h:30
+- **Classes:** `product-name`
+- **Key styles:** color rgb(0, 58, 99); background rgba(0, 0, 0, 0); font 30.0192px/400; padding 0px 0px 0px 0px; radius 0px
+
+## Source pages
+
+- `raw/applications-case-studies/`
+- `raw/blog/`
+- `raw/blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever/`
+- `raw/company-about-us/`
+- `raw/company-careers-career-opportunities/`
+- `raw/company-news-events-press-releases/`
+- `raw/events/`
+- `raw/home/`
+- `raw/industries-automotive/`
+- `raw/press-release-formfactor-introduces-the-evolvity-300-probe-system/`
+- `raw/product-probe-cards-foundry-logic-apollo/`
+- `raw/products/`
+- `raw/products-probe-cards/`
+- `raw/sales-service-contact-sales/`
+- `raw/technologies-contact-intelligence/`

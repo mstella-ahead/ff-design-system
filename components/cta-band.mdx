@@ -1,0 +1,63 @@
+---
+name: CTA band
+component: cta-band
+instances: 5
+variants: 1
+pages: [blog, company-news-events-press-releases, home, industries-automotive]
+---
+
+# CTA band
+
+A rounded, shadowed panel holding a centered heading and a grid of two or three calls to action.
+
+**When to use:** Use to close a page, or between content sections, when you want to offer the reader two or three next steps of equal weight.
+
+Observed **5** time(s) across **4** page(s).
+
+## Variants
+
+| Variant | Background | Text | Radius | Count | Pages | Example classes |
+|---|---|---|---|---:|---:|---|
+| `default` | — | `#6f6a67` (`dark-grey`) | 0px | 5 | 4 | `cta-box` |
+
+## Rules and gotchas
+
+- The panel itself carries the utility classes `radius shadow` — 30px radius plus the site's one real elevation (`rgba(0,0,0,0.2) 0 4px 15px`).
+- Two or three items per row via `ul.cta-grid`; each `li` uses `flow` for vertical rhythm.
+
+## Canonical markup
+
+Real theme class names, so a prototype inherits the theme CSS. Imagery is a placeholder — FormFactor's own photography and logos are never redistributed from this repo.
+
+```html
+<section class="cta-box">
+  <div class="wrapper">
+    <div class="cta-box__content flow radius shadow">
+      <div class="cta-box__heading flow center"><h2>Ready to talk?</h2></div>
+      <div class="cta-box__body">
+        <ul class="cta-grid">
+          <li class="flow flow-space-600">
+            <p>Talk to an applications engineer about your test challenge.</p>
+            <a class="btn btn-primary" href="/contact">Contact sales</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+```
+
+## Observed instance
+
+The most representative on-canvas instance, for cross-checking against the screenshots.
+
+- **Screenshot:** `raw/home/screenshot.png` — region x:0 y:717 w:1440 h:708
+- **Classes:** `cta-box`
+- **Key styles:** color rgb(111, 106, 103); background rgba(0, 0, 0, 0); font 16px/400; padding 98.56px 0px 98.56px 0px; radius 0px
+
+## Source pages
+
+- `raw/blog/`
+- `raw/company-news-events-press-releases/`
+- `raw/home/`
+- `raw/industries-automotive/`

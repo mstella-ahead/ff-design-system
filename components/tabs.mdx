@@ -1,0 +1,52 @@
+---
+name: Tabs
+component: tabs
+instances: 102
+variants: 2
+pages: [blog, company-careers-career-opportunities, company-news-events-press-releases]
+---
+
+# Tabs
+
+Horizontal tab strip for switching between sibling views of the same page.
+
+**When to use:** Use to filter an archive by year, or to split product detail into panes. Two implementations exist — the theme's own year tabs and BB PowerPack's pp-tabs.
+
+Observed **102** time(s) across **3** page(s).
+
+## Variants
+
+| Variant | Background | Text | Radius | Count | Pages | Example classes |
+|---|---|---|---|---:|---:|---|
+| `year-tabs (theme)` | — | `#00a0af` (`secondary`) | 0px | 70 | 2 | `font-base year-tab` |
+| `pp-tabs (page bui…` | — | `#00a0af` (`secondary`) | 0px | 32 | 1 | `pp-tab-label-inner` |
+
+## Rules and gotchas
+
+- Two independent implementations coexist: the theme's `year-tray`/`year-tab` (archive filtering) and BB PowerPack's `pp-tabs` (product detail panes). Prefer the theme's when building new pages.
+- The theme's year tab is an `h3` wrapping an `a.tab-link` — unusual markup, but it is what ships.
+
+## Canonical markup
+
+Real theme class names, so a prototype inherits the theme CSS. Imagery is a placeholder — FormFactor's own photography and logos are never redistributed from this repo.
+
+```html
+<div class="year-tray">
+  <h3 class="year-tab"><a class="tab-link active" href="?y=2026">2026</a></h3>
+  <h3 class="year-tab"><a class="tab-link" href="?y=2025">2025</a></h3>
+</div>
+```
+
+## Observed instance
+
+The most representative on-canvas instance, for cross-checking against the screenshots.
+
+- **Screenshot:** `raw/blog/screenshot.png` — region x:65 y:2071 w:910 h:30
+- **Classes:** `font-base year-tab`
+- **Key styles:** color rgb(0, 160, 175); background rgba(0, 0, 0, 0); font 30.0192px/400; padding 0px 0px 0px 0px; radius 0px
+
+## Source pages
+
+- `raw/blog/`
+- `raw/company-careers-career-opportunities/`
+- `raw/company-news-events-press-releases/`

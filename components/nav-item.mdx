@@ -1,0 +1,74 @@
+---
+name: Nav item
+component: nav-item
+instances: 90
+variants: 2
+pages: [applications-case-studies, blog, blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever, company-about-us, company-careers-career-opportunities, company-news-events-press-releases, events, home, industries-automotive, press-release-formfactor-introduces-the-evolvity-300-probe-system, product-probe-cards-foundry-logic-apollo, products, products-probe-cards, sales-service-contact-sales, technologies-contact-intelligence]
+---
+
+# Nav item
+
+Link in the fixed site header — top-level mega-menu entries and their dropdown children.
+
+**When to use:** Use inside the header to move between top-level sections. Uppercase, letterspaced, weight 600 at top level.
+
+Observed **90** time(s) across **15** page(s).
+
+## Variants
+
+| Variant | Background | Text | Radius | Count | Pages | Example classes |
+|---|---|---|---|---:|---:|---|
+| `top-level` | — | `#003a63` (`primary`) | 0px | 75 | 15 | `menu-item` |
+| `logo` | — | `#0000ee` | 0px | 15 | 15 | `site-header__logo` |
+
+## Rules and gotchas
+
+- Top-level links are 12px uppercase, letterspaced, weight 600, navy `--primary`, and their box is only **16px tall** — do not gate on height when detecting them.
+- The header is `position: fixed; z-index: 6` at 92px tall, and does not appear in Chromium full-page screenshots. Use `screenshot-viewport.png` to see it.
+- The logo is a 340px-wide inline SVG wrapped in an anchor that has no color declared.
+
+## Canonical markup
+
+Real theme class names, so a prototype inherits the theme CSS. Imagery is a placeholder — FormFactor's own photography and logos are never redistributed from this repo.
+
+```html
+<header class="site-header">
+  <div class="wrapper">
+    <div class="site-header__inner">
+      <a class="site-header__logo" href="/"><!-- 340px inline SVG --></a>
+      <nav id="mega-menu">
+        <div class="top-level">
+          <a class="menu-item" href="/products/">Products</a>
+          <a class="menu-item" href="/applications/">Applications</a>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+```
+
+## Observed instance
+
+The most representative on-canvas instance, for cross-checking against the screenshots.
+
+- **Screenshot:** `raw/applications-case-studies/screenshot-viewport.png` — region x:741 y:38 w:85 h:16
+- **Classes:** `menu-item`
+- **Key styles:** color rgb(0, 58, 99); background rgba(0, 0, 0, 0); font 16px/600; padding 0px 0px 0px 0px; radius 0px
+
+## Source pages
+
+- `raw/applications-case-studies/`
+- `raw/blog/`
+- `raw/blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever/`
+- `raw/company-about-us/`
+- `raw/company-careers-career-opportunities/`
+- `raw/company-news-events-press-releases/`
+- `raw/events/`
+- `raw/home/`
+- `raw/industries-automotive/`
+- `raw/press-release-formfactor-introduces-the-evolvity-300-probe-system/`
+- `raw/product-probe-cards-foundry-logic-apollo/`
+- `raw/products/`
+- `raw/products-probe-cards/`
+- `raw/sales-service-contact-sales/`
+- `raw/technologies-contact-intelligence/`

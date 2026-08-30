@@ -85,7 +85,12 @@ const CAPTURED_PROPS = [
   'color',
   'background-color',
   'border-top-color', 'border-right-color', 'border-bottom-color', 'border-left-color',
-  'border-top-width', 'border-radius',
+  // All four widths, not just the top. A rule that sets only `border-bottom`
+  // leaves border-top-width at 0, and gating the colors on the top width alone
+  // makes those borders invisible to the analyzer — verified: --tertiary-dark
+  // ships as a border-right-color on an element whose top width is 0.
+  'border-top-width', 'border-right-width', 'border-bottom-width', 'border-left-width',
+  'border-radius',
   'box-shadow',
   'outline-color', 'outline-width', 'outline-style', 'outline-offset',
   'font-family', 'font-size', 'font-weight', 'line-height', 'letter-spacing',
@@ -218,21 +223,49 @@ function extractInPage(props: string[]) {
     return parts.join(' > ');
   }
 
-  // Per-element computed styles (visible elements only).
+  // Per-element computed styles (visible elements only), plus ::before/::after.
+  //
+  // The pseudo-element pass is not optional decoration. querySelectorAll('*')
+  // cannot see pseudo-elements, and this theme paints real brand color with them:
+  //   .page-header__body::after { height: 4px; background: var(--orange) }
+  // is the orange rule under every page hero. Without this pass, --orange and
+  // --purple look like declared-but-unused vars when they are in fact rendered on
+  // most pages. Pseudo entries carry the host's rect and a `pseudo` field.
   const elements: Array<Record<string, unknown>> = [];
   document.querySelectorAll('*').forEach((el) => {
     const rect = el.getBoundingClientRect();
     if (rect.width === 0 || rect.height === 0) return;
+    const tag = el.tagName.toLowerCase();
+    const classes = (el.getAttribute('class') ?? '').trim();
+    const path = cssPath(el);
+    const box = { x: Math.round(rect.x), y: Math.round(rect.y), w: Math.round(rect.width), h: Math.round(rect.height) };
+
     const cs = getComputedStyle(el);
     const styles: Record<string, string> = {};
     for (const p of props) styles[p] = cs.getPropertyValue(p).trim();
-    elements.push({
-      tag: el.tagName.toLowerCase(),
-      classes: (el.getAttribute('class') ?? '').trim(),
-      path: cssPath(el),
-      rect: { x: Math.round(rect.x), y: Math.round(rect.y), w: Math.round(rect.width), h: Math.round(rect.height) },
-      styles,
-    });
+    elements.push({ tag, classes, path, rect: box, styles });
+
+    for (const pseudo of ['::before', '::after']) {
+      const ps = getComputedStyle(el, pseudo);
+      // `content: none` means the pseudo-element is not generated at all.
+      const content = ps.getPropertyValue('content').trim();
+      if (!content || content === 'none') continue;
+      const pStyles: Record<string, string> = {};
+      for (const p of props) pStyles[p] = ps.getPropertyValue(p).trim();
+      // Keep only pseudo-elements that actually paint something, otherwise every
+      // `content: ""` clearfix in the stylesheet enters the sample.
+      const paints =
+        (pStyles['background-color'] && !/^rgba\(0, 0, 0, 0\)$/.test(pStyles['background-color'])) ||
+        ['top', 'right', 'bottom', 'left'].some((side) => {
+          const w = pStyles[`border-${side}-width`] ?? '';
+          return w && Number.parseFloat(w) > 0;
+        });
+      if (!paints) continue;
+      elements.push({
+        tag: `${tag}${pseudo}`, classes, path: `${path}${pseudo}`, pseudo,
+        rect: box, styles: pStyles,
+      });
+    }
   });
 
   // :root custom properties — discovered from same-origin stylesheets, resolved

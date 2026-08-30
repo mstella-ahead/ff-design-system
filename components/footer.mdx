@@ -1,0 +1,70 @@
+---
+name: Footer
+component: footer
+instances: 15
+variants: 1
+pages: [applications-case-studies, blog, blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever, company-about-us, company-careers-career-opportunities, company-news-events-press-releases, events, home, industries-automotive, press-release-formfactor-introduces-the-evolvity-300-probe-system, product-probe-cards-foundry-logic-apollo, products, products-probe-cards, sales-service-contact-sales, technologies-contact-intelligence]
+---
+
+# Footer
+
+Site-wide footer: four link columns, corporate info, and a bottom-rounded top edge.
+
+**When to use:** Use on every page. The column count is driven by --footer-body-columns (3) with .col-one … .col-four in the markup.
+
+Observed **15** time(s) across **15** page(s).
+
+## Variants
+
+| Variant | Background | Text | Radius | Count | Pages | Example classes |
+|---|---|---|---|---:|---:|---|
+| `default` | `#003a63` (`primary`) | `#6f6a67` (`dark-grey`) | 0px | 15 | 15 | `[ site-footer ] [ bg-dark ]` |
+
+## Rules and gotchas
+
+- Top corners are rounded (`0px 0px 30px 30px` observed on `div.footer`) so the footer reads as a panel lifting off the page bottom.
+- `--yellow` (#d2d755) appears here and essentially nowhere else — it is a footer-only accent on all 15 pages.
+
+## Canonical markup
+
+Real theme class names, so a prototype inherits the theme CSS. Imagery is a placeholder — FormFactor's own photography and logos are never redistributed from this repo.
+
+```html
+<footer class="site-footer">
+  <section class="site-footer__inner">
+    <div class="site-footer__body">
+      <div class="col col-one">  <!-- repeat col-two … col-four -->
+        <h3>Products</h3>
+        <ul><li><a href="/products/">Probe Cards</a></li></ul>
+      </div>
+    </div>
+    <div class="site-footer__info"><p>&copy; FormFactor, Inc.</p></div>
+  </section>
+</footer>
+```
+
+## Observed instance
+
+The most representative on-canvas instance, for cross-checking against the screenshots.
+
+- **Screenshot:** `raw/applications-case-studies/screenshot.png` — region x:0 y:1296 w:1440 h:528
+- **Classes:** `[ site-footer ] [ bg-dark ]`
+- **Key styles:** color rgb(111, 106, 103); background rgb(0, 58, 99); font 16px/400; padding 0px 0px 0px 0px; radius 0px
+
+## Source pages
+
+- `raw/applications-case-studies/`
+- `raw/blog/`
+- `raw/blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever/`
+- `raw/company-about-us/`
+- `raw/company-careers-career-opportunities/`
+- `raw/company-news-events-press-releases/`
+- `raw/events/`
+- `raw/home/`
+- `raw/industries-automotive/`
+- `raw/press-release-formfactor-introduces-the-evolvity-300-probe-system/`
+- `raw/product-probe-cards-foundry-logic-apollo/`
+- `raw/products/`
+- `raw/products-probe-cards/`
+- `raw/sales-service-contact-sales/`
+- `raw/technologies-contact-intelligence/`

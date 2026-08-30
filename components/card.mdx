@@ -1,0 +1,77 @@
+---
+name: Card
+component: card
+instances: 113
+variants: 8
+pages: [blog, blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever, company-about-us, company-careers-career-opportunities, company-news-events-press-releases, home, industries-automotive, press-release-formfactor-introduces-the-evolvity-300-probe-system, product-probe-cards-foundry-logic-apollo, products, products-probe-cards, sales-service-contact-sales, technologies-contact-intelligence]
+---
+
+# Card
+
+Rounded surface grouping a heading, description, image and link — the workhorse of every index page.
+
+**When to use:** Use in a grid to present a set of peer items (product families, industries, posts, CTAs). Always 30px radius; never square.
+
+Observed **113** time(s) across **13** page(s).
+
+## Variants
+
+| Variant | Background | Text | Radius | Count | Pages | Example classes |
+|---|---|---|---|---:|---:|---|
+| `article-surface` | — | `#6f6a67` (`dark-grey`) | 30px | 43 | 5 | `[ year-tray ] [ radius shadow ]` |
+| `div-surface` | — | `#0000ee` | 0px | 36 | 11 | `[ product-family-card__product ] [ flow flow-space-400 ]` |
+| `cta-card` | — | `#6f6a67` (`dark-grey`) | 0px | 12 | 1 | `cta-card` |
+| `product-family-ca…` | — | `#003a63` (`primary`) | 30px | 12 | 1 | `[ product-family-card ] [ flow flow-space-600 ] [ shado…` |
+| `featured-post` | — | `#6f6a67` (`dark-grey`) | 30px | 4 | 4 | `[ featured-post ] [ radius shadow default-padding ]` |
+| `industry-card` | — | `#6f6a67` (`dark-grey`) | 30px | 3 | 1 | `[ industry-card ] [ radius shadow default-padding ]` |
+| `media-card` | — | `#6f6a67` (`dark-grey`) | 30px | 2 | 1 | `[ media-card ] [ radius shadow ]` |
+| `form-card` | `#ffffff` (`light`) | `#6f6a67` (`dark-grey`) | 30px | 1 | 1 | `[ form-card ] [ radius shadow default-padding ]` |
+
+## Rules and gotchas
+
+- Always 30px radius. There is no square-cornered card on this site.
+- The card is usually an `article` or `li`, not a `div` — 59 of the 115 rounded surfaces in the crawl are `article`.
+- One image treatment rounds only the top corners (`30px 30px 0px 0px`) so the image meets the card edge flush.
+
+## Canonical markup
+
+Real theme class names, so a prototype inherits the theme CSS. Imagery is a placeholder — FormFactor's own photography and logos are never redistributed from this repo.
+
+```html
+<ul class="product-family-card__grid">
+  <li>
+    <article class="product-family-card radius shadow">
+      <img src="https://placehold.co/600x400" alt="">
+      <h2 class="product-family-card__heading">Apollo</h2>
+      <p class="product-family-card__description">
+        High-parallelism probe card for foundry and logic test.
+      </p>
+      <a class="btn btn-primary" href="/product/apollo/">View product</a>
+    </article>
+  </li>
+</ul>
+```
+
+## Observed instance
+
+The most representative on-canvas instance, for cross-checking against the screenshots.
+
+- **Screenshot:** `raw/blog/screenshot.png` — region x:25 y:2031 w:990 h:2030
+- **Classes:** `[ year-tray ] [ radius shadow ]`
+- **Key styles:** color rgb(111, 106, 103); background rgba(0, 0, 0, 0); font 16px/400; padding 40px 40px 40px 40px; radius 30px
+
+## Source pages
+
+- `raw/blog/`
+- `raw/blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever/`
+- `raw/company-about-us/`
+- `raw/company-careers-career-opportunities/`
+- `raw/company-news-events-press-releases/`
+- `raw/home/`
+- `raw/industries-automotive/`
+- `raw/press-release-formfactor-introduces-the-evolvity-300-probe-system/`
+- `raw/product-probe-cards-foundry-logic-apollo/`
+- `raw/products/`
+- `raw/products-probe-cards/`
+- `raw/sales-service-contact-sales/`
+- `raw/technologies-contact-intelligence/`

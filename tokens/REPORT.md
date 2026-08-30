@@ -1,27 +1,29 @@
 # FormFactor tokens — analysis report
 
-Generated: 2026-08-30T18:36:25.043Z
+Generated: 2026-08-30T18:52:22.999Z
 Source: 15 pages under `raw/`
 
 ## How to read this report
 
 Two properties of this particular crawl would produce a wrong palette if taken at face value, so both are corrected before anything is measured.
 
-**1. Third-party overlay widgets are excluded.** **1200 of 8345 captured elements (14.4%) were dropped**; 7145 remain. Two widgets mount on every page and are never dismissed:
+**1. Third-party overlay widgets are excluded.** **1260 of 8546 captured elements (14.7%) were dropped**; 7286 remain. Two widgets mount on every page and are never dismissed:
 
 - **CookieYes** hides its banner on accept but leaves the preference-center modal mounted with real dimensions (~73 elements/page). Its own body text `#212121` ranked **4th** in the unfiltered palette on 885 occurrences and is not a FormFactor color at all. It is also themed in FormFactor's teal, which inflated the real `#00a0af` by ~52%.
 - **WP Download Manager's side panel** contributes one hidden instance per page in stock Tailwind slate (`#0f172a`, `#1e293b`, `#64748b`) — three colors that otherwise entered the palette as *core* tokens at a deceptive 15/15 page spread.
 
 BB PowerPack (`pp-*`/`fl-*`) and Formidable (`frm-*`) are deliberately **not** filtered: those plugins build FormFactor's real pages and forms.
 
-**2. Frequencies are page-weighted, not raw.** The two paginated index templates (`company-news-events-press-releases` 2126, `blog` 1903) are **56.4% of all elements**, so a raw histogram describes a press-release list item rather than FormFactor. Every ranking below uses:
+**2. Frequencies are page-weighted, not raw.** The two paginated index templates (`company-news-events-press-releases` 2135, `blog` 1913) are **55.6% of all elements**, so a raw histogram describes a press-release list item rather than FormFactor. Every ranking below uses:
 
 - **spread** — how many of the 15 page templates a value appears on. Immune to page size.
 - **norm** — each page contributes one vote (its observations sum to 1.0), so all norms across a category sum to 15.
 
 Raw counts are still recorded in every token's `$extensions` so each decision stays auditable.
 
-**3. Names are FormFactor's where FormFactor has one.** The theme publishes its own `:root` tokens, so clusters that match an authored var are named after it (`primary`, not `blue-800`) and live under `color.theme.*`. The oklch-derived name is retained as `generatedName`. Clusters with no authored match land in `color.palette.*`.
+**3. Pseudo-elements are captured.** `querySelectorAll('*')` cannot see `::before`/`::after`, but this theme paints real brand color with them — `.page-header__body::after` is the 4px orange rule under every page hero. The crawler therefore reads `getComputedStyle(el, '::before'|'::after')` too and keeps the 141 generated elements that actually paint a background or border. Without this pass `--orange` and `--purple` look like declared-but-unused vars when they are in fact rendered on most pages. Colors that *only* ever ship this way are marked `pseudoElementOnly`.
+
+**4. Names are FormFactor's where FormFactor has one.** The theme publishes its own `:root` tokens, so clusters that match an authored var are named after it (`primary`, not `blue-800`) and live under `color.theme.*`. The oklch-derived name is retained as `generatedName`. Clusters with no authored match land in `color.palette.*`.
 
 ## Authored theme colors — load-bearing vs declared-only
 
@@ -30,74 +32,82 @@ The theme declares **13** color vars in `:root`. Being declared is not the same 
 
 | Authored var | Hex | Observed? | Token | Count | Spread | Roles (txt/bg/bdr) |
 |---|---|---|---|---:|---:|---|
-| `--primary` | `#003a63` | ✅ yes | `color.theme.primary` | 1855 | 15/15 | 1764/91/0 |
+| `--primary` | `#003a63` | ✅ yes | `color.theme.primary` | 1936 | 15/15 | 1845/91/0 |
 | `--dark` | `#003154` | ✅ yes | `color.theme.dark` | 30 | 15/15 | 0/30/0 |
-| `--secondary` | `#00a0af` | ✅ yes | `color.theme.secondary` | 115 | 15/15 | 115/0/0 |
+| `--secondary` | `#00a0af` | ✅ yes | `color.theme.secondary` | 200 | 15/15 | 122/78/0 |
 | `--secondary-light` | `#22b5d4` | ⚪️ declared only | — | 0 | 0/15 | — |
 | `--tertiary` | `#4d7592` | ⚪️ declared only | — | 0 | 0/15 | — |
-| `--tertiary-dark` | `#336182` | ⚪️ declared only | — | 0 | 0/15 | — |
-| `--light` | `#ffffff` | ✅ yes | `color.theme.light` | 1002 | 15/15 | 905/57/40 |
-| `--grey` | `#e1e1e1` | ✅ yes | `color.theme.grey` | 6 | 2/15 | 0/0/6 |
-| `--dark-grey` | `#6f6a67` | ✅ yes | `color.theme.dark-grey` | 4113 | 15/15 | 4055/9/49 |
-| `--grey-secondary` | `#9c968d` | ✅ yes | `color.theme.grey-secondary` | 197 | 15/15 | 69/0/128 |
-| `--orange` | `#f26728` | ⚪️ declared only | — | 0 | 0/15 | — |
-| `--purple` | `#7c2855` | ⚪️ declared only | — | 0 | 0/15 | — |
-| `--yellow` | `#d2d755` | ✅ yes | `color.theme.yellow` | 15 | 15/15 | 15/0/0 |
+| `--tertiary-dark` | `#336182` | ✅ yes | `color.theme.tertiary-dark` | 15 | 15/15 | 0/0/15 |
+| `--light` | `#ffffff` | ✅ yes | `color.theme.light` | 1015 | 15/15 | 909/57/49 |
+| `--grey` | `#e1e1e1` | ✅ yes | `color.theme.grey` | 18 | 4/15 | 0/12/6 |
+| `--dark-grey` | `#6f6a67` | ✅ yes | `color.theme.dark-grey` | 4113 | 15/15 | 4104/9/0 |
+| `--grey-secondary` | `#9c968d` | ✅ yes | `color.theme.grey-secondary` | 201 | 15/15 | 69/4/128 |
+| `--orange` | `#f26728` | ◐ via `::before`/`::after` only | `color.theme.orange` | 25 | 13/15 | 0/25/0 |
+| `--purple` | `#7c2855` | ◐ via `::before`/`::after` only | `color.theme.purple` | 11 | 7/15 | 0/11/0 |
+| `--yellow` | `#d2d755` | ✅ yes | `color.theme.yellow` | 26 | 15/15 | 15/11/0 |
 
-**5 declared-only:** `--secondary-light`, `--tertiary`, `--tertiary-dark`, `--orange`, `--purple`. Present in the stylesheet but never resolved onto a rendered element in these 15 templates. Treat as available-but-unproven, not as part of the working palette.
+**2 declared-only:** `--secondary-light`, `--tertiary`. Present in the stylesheet but never resolved onto a rendered element in these 15 templates. Treat as available-but-unproven, not as part of the working palette.
 
 ## Palette
 
-16 tokens clustered from 18 distinct observed colors (CIEDE2000 ΔE ≤ 2, seed min-count 2) — **10 core** (≥3 page templates) + **6 extended** (confined to 1–2 templates). Ordered by page-weighted norm.
+19 tokens clustered from 21 distinct observed colors (CIEDE2000 ΔE ≤ 2, seed min-count 2) — **14 core** (≥3 page templates) + **5 extended** (confined to 1–2 templates). Ordered by page-weighted norm.
 
 ### Core UI palette
 
+⭐ brand mark · ◐ ships only via `::before`/`::after` · (social) routed to `color.social.*`, not FormFactor's palette
+
 | Token | Source | Hex | Norm | Count | Roles (txt/bg/bdr) | Merged | Pages |
 |---|---|---|---:|---:|---|---:|---:|
-| `dark-grey` | `--dark-grey` | `#6f6a67` | 6.600 | 4113 | 4055/9/49 | 1 | 15 |
-| `light` | `--light` | `#ffffff` | 3.573 | 1002 | 905/57/40 | 1 | 15 |
-| `primary` ⭐ | `--primary` | `#003a63` | 3.460 | 1855 | 1764/91/0 | 1 | 15 |
-| `grey-secondary` | `--grey-secondary` | `#9c968d` | 0.649 | 197 | 69/0/128 | 1 | 15 |
-| `secondary` ⭐ | `--secondary` | `#00a0af` | 0.314 | 115 | 115/0/0 | 1 | 15 |
-| `dark` ⭐ | `--dark` | `#003154` | 0.116 | 30 | 0/30/0 | 1 | 15 |
-| `yellow` | `--yellow` | `#d2d755` | 0.058 | 15 | 15/0/0 | 1 | 15 |
-| `blue-600` | _blue-600_ | `#1e75b4` | 0.010 | 3 | 0/3/0 | 1 | 3 |
-| `blue-400` | _blue-400_ | `#2bacdb` | 0.010 | 3 | 0/3/0 | 1 | 3 |
-| `indigo-800` | _indigo-800_ | `#2d3a8b` | 0.010 | 3 | 0/3/0 | 1 | 3 |
+| `dark-grey` | `--dark-grey` | `#6f6a67` | 6.307 | 4113 | 4104/9/0 | 1 | 15 |
+| `primary` ⭐ | `--primary` | `#003a63` | 3.522 | 1936 | 1845/91/0 | 1 | 15 |
+| `light` | `--light` | `#ffffff` | 3.361 | 1015 | 909/57/49 | 1 | 15 |
+| `grey-secondary` | `--grey-secondary` | `#9c968d` | 0.628 | 201 | 69/4/128 | 1 | 15 |
+| `secondary` ⭐ | `--secondary` | `#00a0af` | 0.592 | 200 | 122/78/0 | 1 | 15 |
+| `dark` ⭐ | `--dark` | `#003154` | 0.108 | 30 | 0/30/0 | 1 | 15 |
+| `yellow` | `--yellow` | `#d2d755` | 0.084 | 26 | 15/11/0 | 1 | 15 |
+| `orange` | `--orange` ◐ | `#f26728` | 0.081 | 25 | 0/25/0 | 1 | 13 |
+| `tertiary-dark` | `--tertiary-dark` | `#336182` | 0.054 | 15 | 0/0/15 | 1 | 15 |
+| `grey` | `--grey` | `#e1e1e1` | 0.049 | 18 | 0/12/6 | 2 | 4 |
+| `purple` | `--purple` ◐ | `#7c2855` | 0.031 | 11 | 0/11/0 | 1 | 7 |
+| `blue-600` | _blue-600_ (social) | `#1e75b4` | 0.009 | 3 | 0/3/0 | 1 | 3 |
+| `blue-400` | _blue-400_ (social) | `#2bacdb` | 0.009 | 3 | 0/3/0 | 1 | 3 |
+| `indigo-800` | _indigo-800_ (social) | `#2d3a8b` | 0.009 | 3 | 0/3/0 | 1 | 3 |
 
 ### Extended (accent / one-off)
 
 | Token | Source | Hex | Norm | Count | Roles (txt/bg/bdr) | Merged | Pages |
 |---|---|---|---:|---:|---|---:|---:|
 | `neutral-700` | _neutral-700_ | `#555555` | 0.051 | 17 | 17/0/0 | 1 | 1 |
-| `neutral-800` | _neutral-800_ | `#444444` | 0.042 | 14 | 5/0/9 | 1 | 1 |
-| `neutral-300` | _neutral-300_ | `#cccccc` | 0.042 | 13 | 1/0/12 | 1 | 2 |
+| `neutral-300` | _neutral-300_ | `#cccccc` | 0.041 | 13 | 1/0/12 | 1 | 2 |
 | `orange-600` | _orange-600_ | `#b94a48` | 0.039 | 13 | 13/0/0 | 1 | 1 |
-| `grey` | `--grey` | `#e1e1e1` | 0.016 | 6 | 0/0/6 | 2 | 2 |
+| `neutral-800` | _neutral-800_ | `#444444` | 0.015 | 5 | 5/0/0 | 1 | 1 |
 | `neutral-800-2` | _neutral-800-2_ | `#333333` | 0.007 | 2 | 2/0/0 | 1 | 1 |
 
 ### Frequency, page-weighted (dominant → drift)
 
 ```
-#6f6a67   6.600 ████████████████████████ dark-grey
-#ffffff   3.573 █████████████··········· light
-#003a63   3.460 █████████████··········· primary
-#9c968d   0.649 ██······················ grey-secondary
-#00a0af   0.314 █······················· secondary
-#003154   0.116 ························ dark
-#d2d755   0.058 ························ yellow
+#6f6a67   6.307 ████████████████████████ dark-grey
+#003a63   3.522 █████████████··········· primary
+#ffffff   3.361 █████████████··········· light
+#9c968d   0.628 ██······················ grey-secondary
+#00a0af   0.592 ██······················ secondary
+#003154   0.108 ························ dark
+#d2d755   0.084 ························ yellow
+#f26728   0.081 ························ orange
+#336182   0.054 ························ tertiary-dark
 #555555   0.051 ························ neutral-700
-#444444   0.042 ························ neutral-800
-#cccccc   0.042 ························ neutral-300
+#e1e1e1   0.049 ························ grey
+#cccccc   0.041 ························ neutral-300
 #b94a48   0.039 ························ orange-600
-#e1e1e1   0.016 ························ grey
-#1e75b4   0.010 ························ blue-600
-#2bacdb   0.010 ························ blue-400
-#2d3a8b   0.010 ························ indigo-800
+#7c2855   0.031 ························ purple
+#444444   0.015 ························ neutral-800
+#1e75b4   0.009 ························ blue-600
+#2bacdb   0.009 ························ blue-400
+#2d3a8b   0.009 ························ indigo-800
 #333333   0.007 ························ neutral-800-2
 ```
 
-**Dominant vs drift:** the 10 core tokens are the real palette; the 6 extended tokens are accents confined to one or two templates. 1 near-duplicate shades were merged into their nearest token, and 1 rare one-off colors (count < 2) were dropped as drift.
+**Dominant vs drift:** the 14 core tokens are the real palette; the 5 extended tokens are accents confined to one or two templates. 1 near-duplicate shades were merged into their nearest token, and 1 rare one-off colors (count < 2) were dropped as drift.
 
 ## Unstyled elements (user-agent defaults)
 
@@ -184,29 +194,29 @@ Base size: **16px** (highest page-weighted norm).
 
 | px | Norm | Count | Spread | | Authored step |
 |---:|---:|---:|---:|---|---|
-| 14 | 1.862 | 458 | 15/15 | `███·············` | — |
-| 16 | 8.888 | 3156 | 15/15 | `████████████████` | `--size-400` (16px) |
-| 18 | 3.462 | 3116 | 15/15 | `██████··········` | — |
-| 19 | 0.214 | 91 | 3/15 | `················` | — |
-| 20 | 0.030 | 9 | 3/15 | `················` | `--size-500` (21.28px) |
-| 21 | 0.008 | 2 | 1/15 | `················` | `--size-500` (21.28px) |
-| 25 | 0.098 | 25 | 5/15 | `················` | — |
-| 26 | 0.035 | 8 | 7/15 | `················` | — |
-| 28 | 0.012 | 3 | 1/15 | `················` | `--size-600` (28.32px) |
-| 30 | 0.199 | 224 | 9/15 | `················` | — |
-| 38 | 0.004 | 1 | 1/15 | `················` | `--size-700` (37.76px) |
-| 45 | 0.130 | 38 | 6/15 | `················` | — |
-| 67 | 0.057 | 14 | 13/15 | `················` | `--size-900` (67.2px) |
+| 14 | 1.788 | 458 | 15/15 | `███·············` | — |
+| 16 | 9.055 | 3289 | 15/15 | `████████████████` | `--size-400` (16px) |
+| 18 | 3.373 | 3116 | 15/15 | `██████··········` | — |
+| 19 | 0.208 | 91 | 3/15 | `················` | — |
+| 20 | 0.029 | 9 | 3/15 | `················` | `--size-500` (21.28px) |
+| 21 | 0.007 | 2 | 1/15 | `················` | `--size-500` (21.28px) |
+| 25 | 0.093 | 25 | 5/15 | `················` | — |
+| 26 | 0.034 | 8 | 7/15 | `················` | — |
+| 28 | 0.011 | 3 | 1/15 | `················` | `--size-600` (28.32px) |
+| 30 | 0.214 | 231 | 9/15 | `················` | — |
+| 38 | 0.008 | 2 | 1/15 | `················` | `--size-700` (37.76px) |
+| 45 | 0.125 | 38 | 6/15 | `················` | — |
+| 67 | 0.055 | 14 | 13/15 | `················` | `--size-900` (67.2px) |
 
 Font weights:
 
 | Weight | Norm | Count | Spread |
 |---:|---:|---:|---:|
-| 400 | 11.968 | 6395 | 15/15 |
-| 900 | 1.234 | 300 | 15/15 |
-| 700 | 0.971 | 246 | 15/15 |
-| 600 | 0.802 | 195 | 15/15 |
-| 800 | 0.025 | 9 | 1/15 |
+| 400 | 11.790 | 6461 | 15/15 |
+| 900 | 1.185 | 300 | 15/15 |
+| 600 | 1.067 | 270 | 15/15 |
+| 700 | 0.934 | 246 | 15/15 |
+| 800 | 0.024 | 9 | 1/15 |
 
 ## Spacing
 
@@ -230,40 +240,42 @@ The theme's `--size-*` vars form a consistent **1.334× modular scale** off `--b
 
 ### Observed spacing
 
-Inferred base grid: **2px** (73% of page-weighted spacing values are multiples).
+Inferred base grid: **2px** (71% of page-weighted spacing values are multiples).
 
-**26 dominant values** (norm ≥ 0.5% of the page-weighted total):
+**28 dominant values** (norm ≥ 0.5% of the page-weighted total):
 
 | px | Norm | Count | Spread | Nearest authored step |
 |---:|---:|---:|---:|---|
-| 4 | 0.704 | 151 | 15/15 | `--size-200` (8.96px, Δ5.0) |
-| 5 | 0.235 | 67 | 15/15 | `--size-200` (8.96px, Δ4.0) |
-| 6 | 0.238 | 55 | 5/15 | `--size-200` (8.96px, Δ3.0) |
-| 8 | 0.622 | 143 | 15/15 | `--size-200` (8.96px, Δ1.0) |
-| 10 | 0.703 | 191 | 15/15 | `--size-200` (8.96px, Δ1.0) |
-| 12 | 1.835 | 357 | 15/15 | `--size-300` (12px, Δ0.0) |
-| 13 | 0.080 | 12 | 2/15 | `--size-300` (12px, Δ1.0) |
-| 15 | 0.186 | 60 | 4/15 | `--size-400` (16px, Δ1.0) |
-| 16 | 1.884 | 394 | 15/15 | `--size-400` (16px, Δ0.0) |
-| 18 | 0.199 | 52 | 3/15 | `--size-400` (16px, Δ2.0) |
-| 19 | 0.094 | 34 | 5/15 | `--size-500` (21.28px, Δ2.3) |
-| 20 | 1.227 | 299 | 15/15 | `--size-500` (21.28px, Δ1.3) |
-| 21 | 2.678 | 1135 | 15/15 | `--size-500` (21.28px, Δ0.3) |
-| 24 | 0.317 | 62 | 15/15 | `--size-500` (21.28px, Δ2.7) |
-| 26 | 0.090 | 32 | 3/15 | `--size-600` (28.32px, Δ2.3) |
-| 28 | 0.354 | 92 | 9/15 | `--size-600` (28.32px, Δ0.3) |
-| 30 | 0.653 | 133 | 15/15 | `--size-600` (28.32px, Δ1.7) |
-| 32 | 0.115 | 32 | 4/15 | `--size-600` (28.32px, Δ3.7) |
-| 38 | 0.169 | 36 | 15/15 | `--size-700` (37.76px, Δ0.2) |
-| 40 | 0.331 | 164 | 15/15 | `--size-700` (37.76px, Δ2.2) |
-| 50 | 0.505 | 140 | 15/15 | `--size-800` (50.4px, Δ0.4) |
-| 54 | 0.313 | 62 | 15/15 | `--size-800` (50.4px, Δ3.6) |
-| 60 | 0.474 | 110 | 14/15 | `--size-900` (67.2px, Δ7.2) |
-| 81 | 0.173 | 45 | 12/15 | `--size-major` (89.6px, Δ8.6) |
-| 92 | 0.107 | 21 | 15/15 | `--size-major` (89.6px, Δ2.4) |
-| 99 | 0.360 | 85 | 15/15 | `--size-major` (89.6px, Δ9.4) |
+| 4 | 0.677 | 151 | 15/15 | `--size-200` (8.96px, Δ5.0) |
+| 5 | 0.227 | 67 | 15/15 | `--size-200` (8.96px, Δ4.0) |
+| 6 | 0.230 | 55 | 5/15 | `--size-200` (8.96px, Δ3.0) |
+| 8 | 0.599 | 143 | 15/15 | `--size-200` (8.96px, Δ1.0) |
+| 10 | 0.703 | 195 | 15/15 | `--size-200` (8.96px, Δ1.0) |
+| 12 | 1.759 | 357 | 15/15 | `--size-300` (12px, Δ0.0) |
+| 13 | 0.077 | 12 | 2/15 | `--size-300` (12px, Δ1.0) |
+| 15 | 0.204 | 70 | 4/15 | `--size-400` (16px, Δ1.0) |
+| 16 | 1.807 | 394 | 15/15 | `--size-400` (16px, Δ0.0) |
+| 18 | 0.192 | 52 | 3/15 | `--size-400` (16px, Δ2.0) |
+| 19 | 0.091 | 34 | 5/15 | `--size-500` (21.28px, Δ2.3) |
+| 20 | 1.188 | 299 | 15/15 | `--size-500` (21.28px, Δ1.3) |
+| 21 | 2.611 | 1135 | 15/15 | `--size-500` (21.28px, Δ0.3) |
+| 24 | 0.304 | 62 | 15/15 | `--size-500` (21.28px, Δ2.7) |
+| 26 | 0.087 | 32 | 3/15 | `--size-600` (28.32px, Δ2.3) |
+| 28 | 0.352 | 95 | 9/15 | `--size-600` (28.32px, Δ0.3) |
+| 30 | 0.629 | 133 | 15/15 | `--size-600` (28.32px, Δ1.7) |
+| 32 | 0.112 | 32 | 4/15 | `--size-600` (28.32px, Δ3.7) |
+| 38 | 0.163 | 36 | 15/15 | `--size-700` (37.76px, Δ0.2) |
+| 40 | 0.323 | 164 | 15/15 | `--size-700` (37.76px, Δ2.2) |
+| 49 | 0.374 | 77 | 15/15 | `--size-800` (50.4px, Δ1.4) |
+| 50 | 0.487 | 140 | 15/15 | `--size-800` (50.4px, Δ0.4) |
+| 54 | 0.300 | 62 | 15/15 | `--size-800` (50.4px, Δ3.6) |
+| 60 | 0.465 | 112 | 14/15 | `--size-900` (67.2px, Δ7.2) |
+| 81 | 0.167 | 45 | 12/15 | `--size-major` (89.6px, Δ8.6) |
+| 90 | 0.099 | 23 | 14/15 | `--size-major` (89.6px, Δ0.4) |
+| 92 | 0.103 | 21 | 15/15 | `--size-major` (89.6px, Δ2.4) |
+| 99 | 0.347 | 85 | 15/15 | `--size-major` (89.6px, Δ9.4) |
 
-Long tail (25 rare / off-scale values, flagged not tokenized): 1, 2, 3, 9, 11, 25, 29, 31, 34, 44, 49, 51, 55, 58, 59, 67, 83, 88, 90, 110, 120, 237, 330, 365, 552
+Long tail (23 rare / off-scale values, flagged not tokenized): 1, 2, 3, 9, 11, 25, 29, 31, 34, 44, 51, 55, 58, 59, 67, 83, 88, 110, 120, 237, 330, 365, 552
 
 ## Border radius
 

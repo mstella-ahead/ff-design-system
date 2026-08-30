@@ -10,14 +10,15 @@
             "tier": "core",
             "authoredVar": "--dark-grey",
             "generatedName": "neutral-600",
+            "pseudoElementOnly": false,
             "count": 4113,
             "pageSpread": 15,
             "pageSpreadPct": 100,
-            "normScore": 6.6002,
+            "normScore": 6.3067,
             "roles": {
-              "text": 4055,
+              "text": 4104,
               "bg": 9,
-              "border": 49
+              "border": 0
             },
             "oklch": {
               "l": 0.528,
@@ -50,33 +51,34 @@
           }
         }
       },
-      "light": {
-        "$value": "#ffffff",
+      "primary": {
+        "$value": "#003a63",
         "$type": "color",
-        "$description": "FormFactor theme color `--light`",
+        "$description": "FormFactor theme color `--primary`",
         "$extensions": {
           "com.formfactor.www": {
             "tier": "core",
-            "authoredVar": "--light",
-            "generatedName": "neutral-white",
-            "count": 1002,
+            "authoredVar": "--primary",
+            "generatedName": "blue-800",
+            "pseudoElementOnly": false,
+            "count": 1936,
             "pageSpread": 15,
             "pageSpreadPct": 100,
-            "normScore": 3.5728,
+            "normScore": 3.5223,
             "roles": {
-              "text": 905,
-              "bg": 57,
-              "border": 40
+              "text": 1845,
+              "bg": 91,
+              "border": 0
             },
             "oklch": {
-              "l": 1,
-              "c": 0,
-              "h": 0
+              "l": 0.339,
+              "c": 0.09,
+              "h": 247.2
             },
             "clusterMembers": [
               {
-                "hex": "#ffffff",
-                "count": 1002
+                "hex": "#003a63",
+                "count": 1936
               }
             ],
             "pages": [
@@ -99,33 +101,34 @@
           }
         }
       },
-      "primary": {
-        "$value": "#003a63",
+      "light": {
+        "$value": "#ffffff",
         "$type": "color",
-        "$description": "FormFactor theme color `--primary`",
+        "$description": "FormFactor theme color `--light`",
         "$extensions": {
           "com.formfactor.www": {
             "tier": "core",
-            "authoredVar": "--primary",
-            "generatedName": "blue-800",
-            "count": 1855,
+            "authoredVar": "--light",
+            "generatedName": "neutral-white",
+            "pseudoElementOnly": false,
+            "count": 1015,
             "pageSpread": 15,
             "pageSpreadPct": 100,
-            "normScore": 3.4603,
+            "normScore": 3.3613,
             "roles": {
-              "text": 1764,
-              "bg": 91,
-              "border": 0
+              "text": 909,
+              "bg": 57,
+              "border": 49
             },
             "oklch": {
-              "l": 0.339,
-              "c": 0.09,
-              "h": 247.2
+              "l": 1,
+              "c": 0,
+              "h": 0
             },
             "clusterMembers": [
               {
-                "hex": "#003a63",
-                "count": 1855
+                "hex": "#ffffff",
+                "count": 1015
               }
             ],
             "pages": [
@@ -157,13 +160,14 @@
             "tier": "core",
             "authoredVar": "--grey-secondary",
             "generatedName": "neutral-500",
-            "count": 197,
+            "pseudoElementOnly": false,
+            "count": 201,
             "pageSpread": 15,
             "pageSpreadPct": 100,
-            "normScore": 0.6486,
+            "normScore": 0.6279,
             "roles": {
               "text": 69,
-              "bg": 0,
+              "bg": 4,
               "border": 128
             },
             "oklch": {
@@ -174,7 +178,7 @@
             "clusterMembers": [
               {
                 "hex": "#9c968d",
-                "count": 197
+                "count": 201
               }
             ],
             "pages": [
@@ -206,13 +210,14 @@
             "tier": "core",
             "authoredVar": "--secondary",
             "generatedName": "teal-500",
-            "count": 115,
+            "pseudoElementOnly": false,
+            "count": 200,
             "pageSpread": 15,
             "pageSpreadPct": 100,
-            "normScore": 0.3141,
+            "normScore": 0.5925,
             "roles": {
-              "text": 115,
-              "bg": 0,
+              "text": 122,
+              "bg": 78,
               "border": 0
             },
             "oklch": {
@@ -223,7 +228,7 @@
             "clusterMembers": [
               {
                 "hex": "#00a0af",
-                "count": 115
+                "count": 200
               }
             ],
             "pages": [
@@ -255,10 +260,11 @@
             "tier": "core",
             "authoredVar": "--dark",
             "generatedName": "blue-800-2",
+            "pseudoElementOnly": false,
             "count": 30,
             "pageSpread": 15,
             "pageSpreadPct": 100,
-            "normScore": 0.1159,
+            "normScore": 0.1076,
             "roles": {
               "text": 0,
               "bg": 30,
@@ -304,13 +310,14 @@
             "tier": "core",
             "authoredVar": "--yellow",
             "generatedName": "green-200",
-            "count": 15,
+            "pseudoElementOnly": false,
+            "count": 26,
             "pageSpread": 15,
             "pageSpreadPct": 100,
-            "normScore": 0.058,
+            "normScore": 0.0845,
             "roles": {
               "text": 15,
-              "bg": 0,
+              "bg": 11,
               "border": 0
             },
             "oklch": {
@@ -321,6 +328,104 @@
             "clusterMembers": [
               {
                 "hex": "#d2d755",
+                "count": 26
+              }
+            ],
+            "pages": [
+              "applications-case-studies",
+              "blog",
+              "blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever",
+              "company-about-us",
+              "company-careers-career-opportunities",
+              "company-news-events-press-releases",
+              "events",
+              "home",
+              "industries-automotive",
+              "press-release-formfactor-introduces-the-evolvity-300-probe-system",
+              "product-probe-cards-foundry-logic-apollo",
+              "products",
+              "products-probe-cards",
+              "sales-service-contact-sales",
+              "technologies-contact-intelligence"
+            ]
+          }
+        }
+      },
+      "orange": {
+        "$value": "#f26728",
+        "$type": "color",
+        "$description": "FormFactor theme color `--orange`",
+        "$extensions": {
+          "com.formfactor.www": {
+            "tier": "core",
+            "authoredVar": "--orange",
+            "generatedName": "orange-500",
+            "pseudoElementOnly": true,
+            "count": 25,
+            "pageSpread": 13,
+            "pageSpreadPct": 86.7,
+            "normScore": 0.0807,
+            "roles": {
+              "text": 0,
+              "bg": 25,
+              "border": 0
+            },
+            "oklch": {
+              "l": 0.679,
+              "c": 0.186,
+              "h": 41.8
+            },
+            "clusterMembers": [
+              {
+                "hex": "#f26728",
+                "count": 25
+              }
+            ],
+            "pages": [
+              "applications-case-studies",
+              "blog",
+              "blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever",
+              "company-about-us",
+              "company-news-events-press-releases",
+              "events",
+              "home",
+              "industries-automotive",
+              "press-release-formfactor-introduces-the-evolvity-300-probe-system",
+              "products",
+              "products-probe-cards",
+              "sales-service-contact-sales",
+              "technologies-contact-intelligence"
+            ]
+          }
+        }
+      },
+      "tertiary-dark": {
+        "$value": "#336182",
+        "$type": "color",
+        "$description": "FormFactor theme color `--tertiary-dark`",
+        "$extensions": {
+          "com.formfactor.www": {
+            "tier": "core",
+            "authoredVar": "--tertiary-dark",
+            "generatedName": "blue-700",
+            "pseudoElementOnly": false,
+            "count": 15,
+            "pageSpread": 15,
+            "pageSpreadPct": 100,
+            "normScore": 0.0538,
+            "roles": {
+              "text": 0,
+              "bg": 0,
+              "border": 15
+            },
+            "oklch": {
+              "l": 0.475,
+              "c": 0.074,
+              "h": 241.8
+            },
+            "clusterMembers": [
+              {
+                "hex": "#336182",
                 "count": 15
               }
             ],
@@ -350,16 +455,17 @@
         "$description": "FormFactor theme color `--grey`",
         "$extensions": {
           "com.formfactor.www": {
-            "tier": "extended",
+            "tier": "core",
             "authoredVar": "--grey",
             "generatedName": "neutral-200",
-            "count": 6,
-            "pageSpread": 2,
-            "pageSpreadPct": 13.3,
-            "normScore": 0.0156,
+            "pseudoElementOnly": false,
+            "count": 18,
+            "pageSpread": 4,
+            "pageSpreadPct": 26.7,
+            "normScore": 0.0489,
             "roles": {
               "text": 0,
-              "bg": 0,
+              "bg": 12,
               "border": 6
             },
             "oklch": {
@@ -370,7 +476,7 @@
             "clusterMembers": [
               {
                 "hex": "#e1e1e1",
-                "count": 3
+                "count": 15
               },
               {
                 "hex": "#e8e8e8",
@@ -379,7 +485,51 @@
             ],
             "pages": [
               "industries-automotive",
+              "product-probe-cards-foundry-logic-apollo",
+              "products-probe-cards",
               "sales-service-contact-sales"
+            ]
+          }
+        }
+      },
+      "purple": {
+        "$value": "#7c2855",
+        "$type": "color",
+        "$description": "FormFactor theme color `--purple`",
+        "$extensions": {
+          "com.formfactor.www": {
+            "tier": "core",
+            "authoredVar": "--purple",
+            "generatedName": "red-700",
+            "pseudoElementOnly": true,
+            "count": 11,
+            "pageSpread": 7,
+            "pageSpreadPct": 46.7,
+            "normScore": 0.0306,
+            "roles": {
+              "text": 0,
+              "bg": 11,
+              "border": 0
+            },
+            "oklch": {
+              "l": 0.418,
+              "c": 0.126,
+              "h": 350.8
+            },
+            "clusterMembers": [
+              {
+                "hex": "#7c2855",
+                "count": 11
+              }
+            ],
+            "pages": [
+              "blog",
+              "company-about-us",
+              "company-news-events-press-releases",
+              "home",
+              "industries-automotive",
+              "products",
+              "technologies-contact-intelligence"
             ]
           }
         }
@@ -395,10 +545,11 @@
               "tier": "extended",
               "authoredVar": null,
               "generatedName": "neutral-300",
+              "pseudoElementOnly": false,
               "count": 13,
               "pageSpread": 2,
               "pageSpreadPct": 13.3,
-              "normScore": 0.0421,
+              "normScore": 0.0412,
               "roles": {
                 "text": 1,
                 "bg": 0,
@@ -430,10 +581,11 @@
               "tier": "extended",
               "authoredVar": null,
               "generatedName": "neutral-700",
+              "pseudoElementOnly": false,
               "count": 17,
               "pageSpread": 1,
               "pageSpreadPct": 6.7,
-              "normScore": 0.0512,
+              "normScore": 0.0506,
               "roles": {
                 "text": 17,
                 "bg": 0,
@@ -464,14 +616,15 @@
               "tier": "extended",
               "authoredVar": null,
               "generatedName": "neutral-800",
-              "count": 14,
+              "pseudoElementOnly": false,
+              "count": 5,
               "pageSpread": 1,
               "pageSpreadPct": 6.7,
-              "normScore": 0.0422,
+              "normScore": 0.0149,
               "roles": {
                 "text": 5,
                 "bg": 0,
-                "border": 9
+                "border": 0
               },
               "oklch": {
                 "l": 0.387,
@@ -481,7 +634,7 @@
               "clusterMembers": [
                 {
                   "hex": "#444444",
-                  "count": 14
+                  "count": 5
                 }
               ],
               "pages": [
@@ -498,10 +651,11 @@
               "tier": "extended",
               "authoredVar": null,
               "generatedName": "neutral-800-2",
+              "pseudoElementOnly": false,
               "count": 2,
               "pageSpread": 1,
               "pageSpreadPct": 6.7,
-              "normScore": 0.0075,
+              "normScore": 0.0072,
               "roles": {
                 "text": 2,
                 "bg": 0,
@@ -534,10 +688,11 @@
               "tier": "extended",
               "authoredVar": null,
               "generatedName": "orange-600",
+              "pseudoElementOnly": false,
               "count": 13,
               "pageSpread": 1,
               "pageSpreadPct": 6.7,
-              "normScore": 0.0392,
+              "normScore": 0.0387,
               "roles": {
                 "text": 13,
                 "bg": 0,
@@ -572,10 +727,11 @@
             "tier": "core",
             "authoredVar": null,
             "generatedName": "blue-600",
+            "pseudoElementOnly": false,
             "count": 3,
             "pageSpread": 3,
             "pageSpreadPct": 20,
-            "normScore": 0.0095,
+            "normScore": 0.009,
             "roles": {
               "text": 0,
               "bg": 3,
@@ -609,10 +765,11 @@
             "tier": "core",
             "authoredVar": null,
             "generatedName": "blue-400",
+            "pseudoElementOnly": false,
             "count": 3,
             "pageSpread": 3,
             "pageSpreadPct": 20,
-            "normScore": 0.0095,
+            "normScore": 0.009,
             "roles": {
               "text": 0,
               "bg": 3,
@@ -646,10 +803,11 @@
             "tier": "core",
             "authoredVar": null,
             "generatedName": "indigo-800",
+            "pseudoElementOnly": false,
             "count": 3,
             "pageSpread": 3,
             "pageSpreadPct": 20,
-            "normScore": 0.0095,
+            "normScore": 0.009,
             "roles": {
               "text": 0,
               "bg": 3,

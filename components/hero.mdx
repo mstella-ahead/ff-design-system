@@ -1,0 +1,76 @@
+---
+name: Hero
+component: hero
+instances: 13
+variants: 2
+pages: [applications-case-studies, blog, blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever, company-about-us, company-news-events-press-releases, events, home, industries-automotive, press-release-formfactor-introduces-the-evolvity-300-probe-system, products, products-probe-cards, sales-service-contact-sales, technologies-contact-intelligence]
+---
+
+# Hero
+
+The full-width page header: title, optional summary, optional CTA, over a washed background image.
+
+**When to use:** Use once at the top of every page. The homepage variant is taller and splits its heading across two colors; every other template uses the standard variant.
+
+Observed **13** time(s) across **13** page(s).
+
+## Variants
+
+| Variant | Background | Text | Radius | Count | Pages | Example classes |
+|---|---|---|---|---:|---:|---|
+| `page` | — | `#6f6a67` (`dark-grey`) | 0px | 12 | 12 | `[ page-header ] [ template-blog ]` |
+| `homepage` | — | `#6f6a67` (`dark-grey`) | 0px | 1 | 1 | `[ homepage-header ] [ template-homepage ]` |
+
+## Rules and gotchas
+
+- The `h1` is teal `--secondary` at 67.2px (`--size-900`) weight 400 in **every** template observed — 13/13. This is the strongest single brand rule on the site.
+- The homepage variant additionally splits its sentence across two colors: the `h1` stays teal and an inner `<span>` carries navy `--primary`. That two-tone split is a homepage-only device, not a site-wide pattern.
+- The background image is heavily washed out (near-white overlay) so dark text stays legible over it.
+- A 4px orange rule (`--orange`, #F26728) closes the hero. It is painted by `.page-header__body::after`, not by an element — so it is invisible to any tool that only walks the DOM, and it is the only place `--orange` appears.
+
+## Canonical markup
+
+Real theme class names, so a prototype inherits the theme CSS. Imagery is a placeholder — FormFactor's own photography and logos are never redistributed from this repo.
+
+```html
+<div class="page-header">
+  <div class="wrapper">
+    <div class="page-header__body">
+      <div class="page-header__inner flow">
+        <h1 class="page-header__heading">Semiconductor Test</h1>
+        <div class="page-header__summary flow flow-space-300">
+          <p>We're paving the shortest path <strong>from lab to fab.</strong></p>
+        </div>
+        <a class="btn btn-primary flow-space-500" href="/about">Learn more</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Homepage variant: same structure, two-tone heading -->
+<h1 class="homepage-header__heading">Semiconductor Test <span>and Measurement</span></h1>
+```
+
+## Observed instance
+
+The most representative on-canvas instance, for cross-checking against the screenshots.
+
+- **Screenshot:** `raw/blog/screenshot.png` — region x:0 y:92 w:1440 h:264
+- **Classes:** `[ page-header ] [ template-blog ]`
+- **Key styles:** color rgb(111, 106, 103); background rgba(0, 0, 0, 0); font 16px/400; padding 0px 0px 0px 0px; radius 0px
+
+## Source pages
+
+- `raw/applications-case-studies/`
+- `raw/blog/`
+- `raw/blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever/`
+- `raw/company-about-us/`
+- `raw/company-news-events-press-releases/`
+- `raw/events/`
+- `raw/home/`
+- `raw/industries-automotive/`
+- `raw/press-release-formfactor-introduces-the-evolvity-300-probe-system/`
+- `raw/products/`
+- `raw/products-probe-cards/`
+- `raw/sales-service-contact-sales/`
+- `raw/technologies-contact-intelligence/`

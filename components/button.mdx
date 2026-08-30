@@ -1,0 +1,70 @@
+---
+name: Button
+component: button
+instances: 99
+variants: 6
+pages: [applications-case-studies, blog, blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever, company-about-us, company-careers-career-opportunities, company-news-events-press-releases, events, home, industries-automotive, press-release-formfactor-introduces-the-evolvity-300-probe-system, product-probe-cards-foundry-logic-apollo, products, products-probe-cards, sales-service-contact-sales, technologies-contact-intelligence]
+---
+
+# Button
+
+Pill-shaped action control. Navy fill by default, white fill on dark backgrounds.
+
+**When to use:** Use for actions and primary navigation moments. The 30px radius on a 40px-tall control makes it a full pill — that is the brand read, do not square it.
+
+Observed **99** time(s) across **15** page(s).
+
+## Variants
+
+| Variant | Background | Text | Radius | Count | Pages | Example classes |
+|---|---|---|---|---:|---:|---|
+| `primary` | `#003a63` (`primary`) | `#ffffff` (`light`) | 30px | 31 | 15 | `[ read-more ] [ btn btn-primary ]` |
+| `inline (card wrap…` | — | `#0000ee` | 0px | 18 | 1 | `btn-inline` |
+| `light` | — | `#ffffff` (`light`) | 0px | 17 | 15 | `[ menu-back-button button button-light ]` |
+| `edge-tab` | `#003a63` (`primary`) | `#ffffff` (`light`) | 30px | 15 | 15 | `[ contact-us-button__anchor btn btn-primary ] [ shadow ]` |
+| `ghost` | — | `#003a63` (`primary`) | 0px | 15 | 4 | `[ button ]` |
+| `neutral` | `#ffffff` (`light`) | `#003a63` (`primary`) | 30px | 3 | 2 | `[ btn btn-light ] [ flow-space-700-hd ]` |
+
+## Rules and gotchas
+
+- 30px radius on a 40px-tall control is a full pill. Do not square it — this is the most recognisable geometry on the site.
+- Label is 16px, padding `8px 20px`. Weight is 700 in 39 of 46 observed `btn-primary` instances; the 7 at weight 400 sit inside prose blocks and inherit it, which looks unintentional.
+- `contact-us-button` is a distinctive persistent edge tab, present on every page: `position: fixed; right: 0; top: 25%; z-index: 9`, rotated `-90deg` so the label reads bottom-to-top, with its bottom corners squared (`border-bottom-*-radius: 0`) so the pill appears fused to the viewport edge. A separate `.contact-us-button-mobile` handles small screens.
+- `btn-inline` is not a button at all — it is a card-sized wrapper anchor (421×328) that inherits the browser default blue. Do not copy it.
+- The site also ships a visually-hidden `a.skip-link.button` for keyboard users (17.6px, no radius). It is excluded from the counts here because it is not a button.
+
+## Canonical markup
+
+Real theme class names, so a prototype inherits the theme CSS. Imagery is a placeholder — FormFactor's own photography and logos are never redistributed from this repo.
+
+```html
+<a class="btn btn-primary" href="/contact">Contact sales</a>
+<a class="btn btn-light" href="/learn">Learn more</a>       <!-- on dark bands -->
+<button class="button button-light">Back</button>           <!-- in mega-menu -->
+```
+
+## Observed instance
+
+The most representative on-canvas instance, for cross-checking against the screenshots.
+
+- **Screenshot:** `raw/blog/screenshot.png` — region x:392 y:771 w:129 h:40
+- **Classes:** `[ read-more ] [ btn btn-primary ]`
+- **Key styles:** color rgb(255, 255, 255); background rgb(0, 58, 99); font 16px/400; padding 8px 20px 8px 20px; radius 30px
+
+## Source pages
+
+- `raw/applications-case-studies/`
+- `raw/blog/`
+- `raw/blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever/`
+- `raw/company-about-us/`
+- `raw/company-careers-career-opportunities/`
+- `raw/company-news-events-press-releases/`
+- `raw/events/`
+- `raw/home/`
+- `raw/industries-automotive/`
+- `raw/press-release-formfactor-introduces-the-evolvity-300-probe-system/`
+- `raw/product-probe-cards-foundry-logic-apollo/`
+- `raw/products/`
+- `raw/products-probe-cards/`
+- `raw/sales-service-contact-sales/`
+- `raw/technologies-contact-intelligence/`

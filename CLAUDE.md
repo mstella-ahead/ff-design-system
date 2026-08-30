@@ -243,10 +243,12 @@ Two P4/P6 hypotheses from CLAUDE.md now have answers:
     real value and collapsed the dominant set to four. Zero is a CSS default, not
     a design decision — `collectSpacing` now skips it and emits `space.0`
     explicitly.
-- **Authored-name reconciliation.** 13 authored color vars; **8 are load-bearing,
-  5 are declared-only** (`--secondary-light`, `--tertiary`, `--tertiary-dark`,
-  `--orange`, `--purple` never resolve onto a rendered element in these 15
-  templates). Treat those five as available-but-unproven.
+- **Authored-name reconciliation.** 13 authored color vars. ~~8 load-bearing, 5
+  declared-only~~ — **corrected in P4 after two crawler blind spots were fixed:
+  11 are load-bearing and only 2 (`--secondary-light`, `--tertiary`) are truly
+  declared-only.** `--orange` and `--purple` are painted by pseudo-elements and
+  `--tertiary-dark` by a non-top border; all three were invisible to the crawler,
+  not unused. See "What P4 established".
 - **Vendor `:root` filtering.** 44 authored vars kept, 131 third-party filtered
   across 8 prefixes.
 
@@ -275,10 +277,10 @@ Ordered by norm, and the top seven are *all* authored theme colors:
 | `dark` | `#003154` | 0.12 | **background only** (gradient endpoint / dark bands) |
 | `yellow` | `#d2d755` | 0.06 | footer text, all 15 pages |
 
-The two findings worth carrying into P6: **body text is a warm grey
-(`--dark-grey`), not navy or black**, and **`--secondary` is used exclusively as
-text while `--dark` is used exclusively as background** — those are rules, not
-coincidences.
+Carry into P6: **body text is a warm grey (`--dark-grey`), not navy or black**,
+and **`--dark` is used exclusively as a background**. (The claim that
+`--secondary` is text-only was an artifact of the missing pseudo-element pass —
+it has 78 background uses, all on `::before`/`::after`. See P4.)
 
 ### Geometry — one radius, used everywhere
 
@@ -312,6 +314,130 @@ exception at 20px.
   plugin shadows are held back as drift rather than named `lg`/`xl`/`2xl`, which
   would invent an elevation scale the site does not have.
 
+## What P4 established (2026-08-30)
+
+### Two crawler blind spots — found by looking at a screenshot
+
+Both were invisible to every count and both required patching `crawl.ts` and
+re-crawling. Neither would have been caught by staring at the numbers.
+
+- **Pseudo-elements were never captured.** `querySelectorAll('*')` cannot see
+  `::before`/`::after`, and this theme paints real brand color with them:
+  `.page-header__body::after { height: 4px; background: var(--orange) }` is the
+  orange rule under every page hero. It was visible in
+  `raw/products-probe-cards/screenshot-viewport.png` while `--orange` was being
+  reported as "declared but unused". The crawler now also reads
+  `getComputedStyle(el, '::before'|'::after')` and keeps the generated elements
+  that actually paint a background or border — **201 of 8546 elements (2.4%)**,
+  carrying `--orange` (25), `--purple` (11), teal backgrounds (78, the active-nav
+  underline and list bullets), `--grey` (12) and `--yellow` (11).
+- **Only `border-top-width` was captured**, and all four border *colors* were
+  gated on it — so a rule setting only `border-bottom` or `border-right` was
+  invisible. `--tertiary-dark` ships as a `border-right-color` on an element whose
+  top width is 0, on all 15 pages. The crawler now captures all four widths and
+  the analyzer gates each side on its own.
+
+Net effect: **11 of 13 authored colors are load-bearing, not 8.** The top 11
+tokens by norm are now *all* authored theme colors, which is about as clean a
+reconciliation as this exercise can produce.
+
+### The detectors
+
+Both heuristics CLAUDE.md flagged were wrong, and measurably so:
+
+- **`nav-item`** bounded by `rect.y < 160 && rect.h >= 18`. The five real nav
+  links are 12px uppercase with no padding, so their box is **h=16** — the bound
+  excluded all five and the detector's only header hit was the logo. Now bounded
+  by DOM ancestry (`site-header`/`mega-menu` in `path`), which is what we actually
+  meant and is size-agnostic. 45 → 90 instances.
+- **`card`** gated on `tag === 'div'`, missing FormFactor's cards entirely — they
+  are `article.product-family-card` and `li.cta-card`, and `article` carries 59 of
+  the 115 rounded surfaces. Now accepts article/li/section/div and treats
+  background-color as a surface signal. **17 → 113 instances.**
+- **`link`**'s brand-hex keying was sound but incomplete: 445 white anchors
+  (footer, hero-on-dark) matched nothing. Now has an explicit inverse variant.
+- **`button`** was picking `search-close` as its canonical example — a collapsed
+  control parked at x=1510, off-canvas and 0px radius because it is hidden. The
+  example picker now prefers on-canvas instances and breaks ties by painted area.
+  Also excluded `a.skip-link.button`, which carries a `button` class but is an
+  accessibility bypass link (17.6px, no radius).
+
+12 components: hero, footer, cta-band, breadcrumb, card, tabs, form-field, table,
+button, nav-item, heading, link. Each MDX carries purpose, when-to-use, a variant
+table with token cross-links, hand-written canonical markup using the theme's real
+class names (imagery always `placehold.co`), rules-and-gotchas, and the
+most-representative observed instance with a screenshot region.
+
+### The heading rule — the real brand signature
+
+This supersedes the two-tone hypothesis in the P6 notes below.
+
+**Every heading level is teal `--secondary`, weight 400.** Observed h1 67.2px (13
+templates), h2 45.3px (31), h3 30.0px (40), h4 24.7px (4) — every one teal.
+Navy `--primary` is *never* a heading: it is links (955 anchors), nav (74), tabs
+(35), icons and UI labels. Body copy is warm grey `--dark-grey` (4104 text uses).
+
+So the color system is role-based and unusually disciplined:
+
+| Color | Exclusive role |
+|---|---|
+| `--secondary` teal | all headings h1–h4 |
+| `--dark-grey` warm grey | body copy |
+| `--primary` navy | links, nav, icons, button fills |
+| `--dark` navy-black | backgrounds only |
+| `--grey-secondary` | borders + muted text |
+| `--orange` | the 4px rule under every hero (pseudo-element) |
+| `--yellow` | footer accent |
+
+**The two-tone heading does not repeat.** `h1` is teal on all 13 templates that
+have one, but only the homepage splits its sentence with a navy `<span>`. The
+site-wide rule is the simpler and stronger one: *the page title is always teal at
+`--size-900`*.
+
+### Composition system (feeds P6)
+
+Layout is utility-driven off the modular scale, not ad-hoc margins:
+
+- **`.flow > * + * { margin-top: var(--flow-space) }`** — the owl selector. All
+  vertical rhythm comes from this one rule plus `.flow-space-{200..900}` modifiers
+  that just reset `--flow-space` to a `--size-*` step.
+- **`.radius { border-radius: var(--border-radius) }`** — one geometry utility,
+  and because the var is breakpoint-conditional it is responsive for free.
+- **`.shadow`** — the single elevation, `rgba(0,0,0,0.2) 0 4px 15px`.
+- **`.section-padding` / `.default-padding`** escalate across four breakpoints
+  (`--size-700` → `--size-800`×1.2 → `--size-900`×1.2 → `--size-major`×1.1).
+- **`.wrapper`** is the max-width container (1433 outer → 1390 inner at 1440px).
+
+### FormFactor's own breakpoints (feeds P5)
+
+Read off the theme's utility suffixes rather than inferred from a diff — these are
+the names the theme itself uses:
+
+| Suffix | Media query | Meaning |
+|---|---|---|
+| _(none)_ | `< 480px` | mobile base |
+| `-t` | `min-width: 480px` | tablet |
+| `-sd` | `min-width: 1024px` | small desktop |
+| `-hd` | `min-width: 1435px` | large desktop |
+
+The CSS contains 11 distinct `min-width` values, but only these four are the
+theme's; 576/601/768/769/783/992/1168/1200 come from Bootstrap, WordPress and
+plugins. Note the desktop crawl at 1440px sits *just* above `-hd`.
+
+Six authored vars change between 1440px and 390px: `--border-radius` 30px→**20px**,
+`--logo-width` 340→224, `--wrapper-max-width` `calc(1390px + …)`→`65rem`,
+`--footer-body-column-gap`/`-row-gap` calc→fixed, `--mega-menu-section-b` 280→265.
+
+### Components that do not exist
+
+Recorded rather than invented:
+
+- **No pull quote.** Zero `<blockquote>` in all 15 templates, including the
+  long-form blog post.
+- **No spec table.** Exactly one `<table>` in the whole crawl (5 `th`, 20 `td`, on
+  one industry page). The product detail page has none. CLAUDE.md predicted both;
+  the data says no.
+
 ## Phases (checkpoint-driven — stop at each for review)
 
 - **P0 — Scaffold + smoke test.** ✅ **DONE.** `npm install`, chromium present,
@@ -332,8 +458,13 @@ exception at 20px.
   passes (109 tokens, 2 aliases resolve). Authored-name reconciliation is in:
   `color.theme.*` uses FormFactor's own names and keeps the oklch name as
   `generatedName`. See "What P3 established" below.
-- **P4 — Components.** Cluster repeated elements + read them off screenshots →
-  `components/*.mdx`. Two heuristics inherited from the internal-app version
+- **P4 — Components.** ✅ **DONE** (2026-08-30). 12 components in
+  `components/*.mdx` + an index with an honest-gaps section. Both flagged
+  heuristics were measurably wrong and are fixed; two crawler blind spots were
+  found and required a re-crawl. See "What P4 established" below.
+- **P4 (original note, kept for context).** Cluster repeated elements + read them
+  off screenshots → `components/*.mdx`. Two heuristics inherited from the
+  internal-app version
   **need retuning here and are flagged in the code**: `nav-item` now bounds by
   `rect.y < 160` (top header bar) instead of a left sidebar, and the `link` /
   `button` variant detection keys off `FF_BRAND_HEXES`

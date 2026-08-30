@@ -1,0 +1,58 @@
+---
+name: Breadcrumb
+component: breadcrumb
+instances: 11
+variants: 1
+pages: [applications-case-studies, blog, blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever, company-about-us, company-news-events-press-releases, events, industries-automotive, press-release-formfactor-introduces-the-evolvity-300-probe-system, product-probe-cards-foundry-logic-apollo, sales-service-contact-sales, technologies-contact-intelligence]
+---
+
+# Breadcrumb
+
+Ancestor trail above the page content, rendered by WooCommerce.
+
+**When to use:** Use on pages nested below a section index (products, categories, product detail). Absent on the homepage and top-level landing pages.
+
+Observed **11** time(s) across **11** page(s).
+
+## Variants
+
+| Variant | Background | Text | Radius | Count | Pages | Example classes |
+|---|---|---|---|---:|---:|---|
+| `default` | — | `#9c968d` (`grey-secondary`) | 0px | 11 | 11 | `woocommerce-breadcrumb` |
+
+## Rules and gotchas
+
+- Rendered by WooCommerce, so the markup is a flat `nav` with `/` separators rather than a list.
+- Absent on the homepage and on top-level landing pages — 11 of 15 templates.
+
+## Canonical markup
+
+Real theme class names, so a prototype inherits the theme CSS. Imagery is a placeholder — FormFactor's own photography and logos are never redistributed from this repo.
+
+```html
+<nav class="woocommerce-breadcrumb">
+  <a href="/">Home</a> / <a href="/products/">Products</a> / Probe Cards
+</nav>
+```
+
+## Observed instance
+
+The most representative on-canvas instance, for cross-checking against the screenshots.
+
+- **Screenshot:** `raw/applications-case-studies/screenshot.png` — region x:85 y:113 w:1330 h:24
+- **Classes:** `woocommerce-breadcrumb`
+- **Key styles:** color rgb(156, 150, 141); background rgba(0, 0, 0, 0); font 16px/400; padding 0px 0px 0px 0px; radius 0px
+
+## Source pages
+
+- `raw/applications-case-studies/`
+- `raw/blog/`
+- `raw/blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever/`
+- `raw/company-about-us/`
+- `raw/company-news-events-press-releases/`
+- `raw/events/`
+- `raw/industries-automotive/`
+- `raw/press-release-formfactor-introduces-the-evolvity-300-probe-system/`
+- `raw/product-probe-cards-foundry-logic-apollo/`
+- `raw/sales-service-contact-sales/`
+- `raw/technologies-contact-intelligence/`

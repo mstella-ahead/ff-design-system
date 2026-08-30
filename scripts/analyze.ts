@@ -110,6 +110,8 @@ interface RawElement {
   path: string;
   rect: { x: number; y: number; w: number; h: number };
   styles: Record<string, string>;
+  /** '::before' / '::after' when this entry is a generated pseudo-element. */
+  pseudo?: string;
 }
 
 interface PageRaw {
@@ -256,6 +258,8 @@ interface ColorCluster {
   authoredConflicts: string[];
   /** Every observation sits on a social share control — a platform color, not ours. */
   social: boolean;
+  /** Every observation is on a ::before/::after — real, but invisible to a DOM walk. */
+  pseudoOnly: boolean;
   norm: number;          // page-weighted score (see Tally)
 }
 
@@ -313,7 +317,7 @@ function normalizeColor(raw: string): string | null {
 
 interface UaDefaultStat { hex: string; count: number; pages: Set<string>; selectors: Map<string, number> }
 
-function collectColors(pages: PageRaw[]): { stats: Map<string, ColorStat>; tally: Tally<string>; uaDefaults: Map<string, UaDefaultStat>; socialOnly: Set<string> } {
+function collectColors(pages: PageRaw[]): { stats: Map<string, ColorStat>; tally: Tally<string>; uaDefaults: Map<string, UaDefaultStat>; socialOnly: Set<string>; pseudoOnly: Set<string> } {
   const stats = new Map<string, ColorStat>();
   const tally = newTally<string>();
   const uaDefaults = new Map<string, UaDefaultStat>();
@@ -321,6 +325,15 @@ function collectColors(pages: PageRaw[]): { stats: Map<string, ColorStat>; tally
   // share controls. They are part of the site's vocabulary but emphatically not
   // FormFactor's palette, so we track whether a color is only ever seen there.
   const socialHits = new Map<string, { social: number; total: number }>();
+  // Colors that only ever ship via a ::before/::after. Worth flagging: they are
+  // real and rendered, but invisible to any tool that walks the element tree, so
+  // they are exactly the colors a naive extraction reports as "declared, unused".
+  const pseudoHits = new Map<string, { pseudo: number; total: number }>();
+  const notePseudo = (hex: string, isPseudo: boolean): void => {
+    let r = pseudoHits.get(hex);
+    if (!r) { r = { pseudo: 0, total: 0 }; pseudoHits.set(hex, r); }
+    r.total++; if (isPseudo) r.pseudo++;
+  };
   const noteSocial = (hex: string, isSocial: boolean): void => {
     let r = socialHits.get(hex);
     if (!r) { r = { social: 0, total: 0 }; socialHits.set(hex, r); }
@@ -350,24 +363,28 @@ function collectColors(pages: PageRaw[]): { stats: Map<string, ColorStat>; tally
           d.selectors.set(sel, (d.selectors.get(sel) ?? 0) + 1);
         } else {
           bump(text, 'text', page.slug);
+          notePseudo(text, Boolean(el.pseudo));
         }
       }
       const bg = normalizeColor(st['background-color'] ?? '');
-      if (bg) { bump(bg, 'bg', page.slug); noteSocial(bg, /share-link/.test(el.classes)); }
-      // Border colors only count when there's an actual (top) border — otherwise
-      // every element reports its default border color and floods the palette.
-      const bw = pxOf(st['border-top-width'] ?? '');
-      if (bw && bw > 0) {
-        for (const side of ['border-top-color', 'border-right-color', 'border-bottom-color', 'border-left-color']) {
-          const bc = normalizeColor(st[side] ?? '');
-          if (bc) bump(bc, 'border', page.slug);
-        }
+      if (bg) { bump(bg, 'bg', page.slug); noteSocial(bg, /share-link/.test(el.classes)); notePseudo(bg, Boolean(el.pseudo)); }
+      // A border color only counts when THAT side has a non-zero width. Gating all
+      // four on the top width (the previous behaviour) both floods the palette
+      // with default colors and hides real ones: --tertiary-dark ships as a
+      // border-right-color on an element whose top width is 0.
+      for (const side of ['top', 'right', 'bottom', 'left']) {
+        const bw = pxOf(st[`border-${side}-width`] ?? '');
+        if (bw === null || bw <= 0) continue;
+        const bc = normalizeColor(st[`border-${side}-color`] ?? '');
+        if (bc) { bump(bc, 'border', page.slug); notePseudo(bc, Boolean(el.pseudo)); }
       }
     }
   }
   const socialOnly = new Set<string>();
   for (const [hex, r] of socialHits) if (r.total > 0 && r.social === r.total) socialOnly.add(hex);
-  return { stats, tally, uaDefaults, socialOnly };
+  const pseudoOnly = new Set<string>();
+  for (const [hex, r] of pseudoHits) if (r.total > 0 && r.pseudo === r.total) pseudoOnly.add(hex);
+  return { stats, tally, uaDefaults, socialOnly, pseudoOnly };
 }
 
 function clusterColors(
@@ -375,6 +392,7 @@ function clusterColors(
   tally: Tally<string>,
   authored: AuthoredColor[],
   socialOnly: Set<string>,
+  pseudoOnly: Set<string>,
 ): { clusters: ColorCluster[]; tail: ColorStat[] } {
   const all = [...stats.values()].sort((a, b) => b.count - a.count || a.hex.localeCompare(b.hex));
   const seeds = all.filter((s) => s.count >= COLOR_MIN_COUNT);
@@ -400,7 +418,7 @@ function clusterColors(
         rep: s, repColor: color, members: [s], count: s.count,
         pages: new Set(s.pages), roles: { ...s.roles },
         name: '', generated: '', authored: null, jsonPath: '',
-        brand: false, authoredConflicts: [], social: false, norm: 0,
+        brand: false, authoredConflicts: [], social: false, pseudoOnly: false, norm: 0,
       });
     }
   }
@@ -408,6 +426,7 @@ function clusterColors(
   for (const cl of clusters) {
     cl.norm = cl.members.reduce((acc, m) => acc + tallyNorm(tally, m.hex), 0);
     cl.social = cl.members.every((m) => socialOnly.has(m.hex));
+    cl.pseudoOnly = cl.members.every((m) => pseudoOnly.has(m.hex));
   }
   // Order by page-weighted score, not raw count — two listing pages carry half
   // the elements and would otherwise dictate the whole palette order.
@@ -546,6 +565,7 @@ function buildColorTokens(clusters: ColorCluster[], nPages: number): unknown {
           tier,
           authoredVar: cl.authored ? `--${cl.authored}` : null,
           generatedName: cl.generated,
+          pseudoElementOnly: cl.pseudoOnly,
           count: cl.count,
           pageSpread: cl.pages.size,
           pageSpreadPct: Number(((cl.pages.size / Math.max(1, nPages)) * 100).toFixed(1)),
@@ -1012,7 +1032,10 @@ function buildReport(args: {
   lines.push('- **norm** — each page contributes one vote (its observations sum to 1.0), so all norms across a category sum to ' + nPages + '.', '');
   lines.push('Raw counts are still recorded in every token\'s `$extensions` so each decision stays auditable.', '');
 
-  lines.push('**3. Names are FormFactor\'s where FormFactor has one.** The theme publishes its own `:root` tokens, so clusters that match an authored var are named after it (`primary`, not `blue-800`) and live under `color.theme.*`. The oklch-derived name is retained as `generatedName`. Clusters with no authored match land in `color.palette.*`.', '');
+  const pseudoCount = pages.reduce((a, p) => a + p.elements.filter((e) => e.pseudo).length, 0);
+  lines.push(`**3. Pseudo-elements are captured.** \`querySelectorAll('*')\` cannot see \`::before\`/\`::after\`, but this theme paints real brand color with them — \`.page-header__body::after\` is the 4px orange rule under every page hero. The crawler therefore reads \`getComputedStyle(el, '::before'|'::after')\` too and keeps the ${pseudoCount} generated elements that actually paint a background or border. Without this pass \`--orange\` and \`--purple\` look like declared-but-unused vars when they are in fact rendered on most pages. Colors that *only* ever ship this way are marked \`pseudoElementOnly\`.`, '');
+
+  lines.push('**4. Names are FormFactor\'s where FormFactor has one.** The theme publishes its own `:root` tokens, so clusters that match an authored var are named after it (`primary`, not `blue-800`) and live under `color.theme.*`. The oklch-derived name is retained as `generatedName`. Clusters with no authored match land in `color.palette.*`.', '');
 
   // --- Authored vs observed: the load-bearing question ----------------------
   lines.push('## Authored theme colors — load-bearing vs declared-only', '');
@@ -1023,7 +1046,8 @@ function buildReport(args: {
   for (const av of authored) {
     const cl = byAuthored.get(av.name);
     if (cl) {
-      lines.push(`| \`--${av.name}\` | \`${av.hex}\` | ✅ yes | \`color.theme.${av.name}\` | ${cl.count} | ${cl.pages.size}/${nPages} | ${cl.roles.text}/${cl.roles.bg}/${cl.roles.border} |`);
+      const how = cl.pseudoOnly ? '◐ via `::before`/`::after` only' : '✅ yes';
+      lines.push(`| \`--${av.name}\` | \`${av.hex}\` | ${how} | \`color.theme.${av.name}\` | ${cl.count} | ${cl.pages.size}/${nPages} | ${cl.roles.text}/${cl.roles.bg}/${cl.roles.border} |`);
     } else {
       lines.push(`| \`--${av.name}\` | \`${av.hex}\` | ⚪️ declared only | — | 0 | 0/${nPages} | — |`);
     }
@@ -1046,14 +1070,18 @@ function buildReport(args: {
   const colorRow = (cl: ColorCluster): string => {
     const roles = `${cl.roles.text}/${cl.roles.bg}/${cl.roles.border}`;
     const brand = cl.brand ? ' ⭐' : '';
-    const src = cl.authored ? `\`--${cl.authored}\`` : `_${cl.generated}_`;
+    const src = cl.authored
+      ? `\`--${cl.authored}\`${cl.pseudoOnly ? ' ◐' : ''}`
+      : cl.social ? `_${cl.generated}_ (social)` : `_${cl.generated}_`;
     return `| \`${cl.name}\`${brand} | ${src} | \`${cl.rep.hex}\` | ${cl.norm.toFixed(3)} | ${cl.count} | ${roles} | ${cl.members.length} | ${cl.pages.size} |`;
   };
 
   lines.push('## Palette', '');
   lines.push(`${clusters.length} tokens clustered from ${totalDistinctColors} distinct observed colors (CIEDE2000 ΔE ≤ ${COLOR_DELTA}, seed min-count ${COLOR_MIN_COUNT}) — **${core.length} core** (≥3 page templates) + **${extended.length} extended** (confined to 1–2 templates). Ordered by page-weighted norm.`, '');
   const header = ['| Token | Source | Hex | Norm | Count | Roles (txt/bg/bdr) | Merged | Pages |', '|---|---|---|---:|---:|---|---:|---:|'];
-  lines.push('### Core UI palette', '', ...header);
+  lines.push('### Core UI palette', '');
+  lines.push('⭐ brand mark · ◐ ships only via `::before`/`::after` · (social) routed to `color.social.*`, not FormFactor\'s palette', '');
+  lines.push(...header);
   for (const cl of core) lines.push(colorRow(cl));
   lines.push('');
   if (extended.length) {
@@ -1189,7 +1217,7 @@ const COMPONENTS_DIR = path.resolve('components');
 interface VariantAgg {
   count: number;
   pages: Set<string>;
-  byClasses: Map<string, { count: number; page: string; rect: RawElement['rect']; styles: Record<string, string> }>;
+  byClasses: Map<string, { count: number; page: string; path: string; rect: RawElement['rect']; styles: Record<string, string> }>;
 }
 interface CompAgg { count: number; pages: Set<string>; variants: Map<string, VariantAgg>; }
 
@@ -1200,6 +1228,15 @@ interface ComponentDef {
   whenToUse: string;
   match: (el: RawElement, cls: Set<string>) => boolean;
   variant: (el: RawElement, cls: Set<string>) => string;
+  /**
+   * Canonical markup, written by hand from the observed structure. Class names
+   * are the theme's real ones so a prototype inherits the theme CSS; imagery is
+   * always a placehold.co URL — FormFactor's own photography and logos are never
+   * redistributed from this repo.
+   */
+  example?: string;
+  /** Anything a consumer would get wrong without being told. */
+  notes?: string[];
 }
 
 function classSet(el: RawElement): Set<string> {
@@ -1218,85 +1255,313 @@ function bgVariant(el: RawElement): string {
 }
 function truncate(s: string, n: number): string { return s.length > n ? s.slice(0, n - 1) + '…' : s; }
 
+/** Exact class-token match (not substring — `page-header` must not match `page-header__body`). */
+function hasClass(cls: Set<string>, name: string): boolean { return cls.has(name); }
+
+/** True if the element paints a surface: a background, a shadow, or a real border. */
+function isSurface(el: RawElement): boolean {
+  const bg = normalizeColor(el.styles['background-color'] || '');
+  if (bg && bg !== '#ffffff') return true;
+  if ((el.styles['box-shadow'] || 'none') !== 'none') return true;
+  return ['top', 'right', 'bottom', 'left'].some((side) => {
+    const bw = pxOf(el.styles[`border-${side}-width`] || '');
+    return bw !== null && bw > 0;
+  });
+}
+
 // Detectors run in priority order; each element is attributed to the FIRST match
-// (so a sidebar <a> counts as nav-item, not link). Signals are tag + Tailwind
-// classes + computed styles + geometry — never the unstable phx-* ids.
+// (so a header <a> counts as nav-item, not link). Signals are the theme's own
+// BEM-ish class names plus computed styles and geometry.
+//
+// Retuned in P4 against the 15-page crawl. Two heuristics inherited from the
+// internal-app version of this pipeline were measurably wrong and are fixed here:
+//
+//   nav-item  bounded by `rect.y < 160 && rect.h >= 18`, which excluded all five
+//             real nav links — they are 12px uppercase with no padding, so their
+//             box is h=16. Now bounded by DOM ancestry (`site-header`/`mega-menu`
+//             in the path), which is what we actually mean and is size-agnostic.
+//   card      gated on `tag === 'div'`, which missed FormFactor's cards entirely:
+//             they are `article.product-family-card` and `li.cta-card`, and
+//             `article` carries 59 of the 115 rounded surfaces. Now accepts
+//             article/li/section/div and treats background-color as a surface
+//             signal, not just border/shadow.
 const COMPONENT_DEFS: ComponentDef[] = [
   {
-    slug: 'heading', name: 'Heading',
-    purpose: 'Typographic headings that establish page and section hierarchy.',
-    whenToUse: 'Use for page titles and section labels; choose the level to match the document outline, not for visual size alone.',
-    match: (el) => /^h[1-6]$/.test(el.tag),
-    variant: (el) => el.tag.toLowerCase(),
+    slug: 'hero', name: 'Hero',
+    purpose: 'The full-width page header: title, optional summary, optional CTA, over a washed background image.',
+    whenToUse: 'Use once at the top of every page. The homepage variant is taller and splits its heading across two colors; every other template uses the standard variant.',
+    match: (el, cls) => hasClass(cls, 'homepage-header') || hasClass(cls, 'page-header'),
+    variant: (el, cls) => (hasClass(cls, 'homepage-header') ? 'homepage' : 'page'),
+    notes: [
+      'The `h1` is teal `--secondary` at 67.2px (`--size-900`) weight 400 in **every** template observed — 13/13. This is the strongest single brand rule on the site.',
+      'The homepage variant additionally splits its sentence across two colors: the `h1` stays teal and an inner `<span>` carries navy `--primary`. That two-tone split is a homepage-only device, not a site-wide pattern.',
+      'The background image is heavily washed out (near-white overlay) so dark text stays legible over it.',
+      'A 4px orange rule (`--orange`, #F26728) closes the hero. It is painted by `.page-header__body::after`, not by an element — so it is invisible to any tool that only walks the DOM, and it is the only place `--orange` appears.',
+    ],
+    example: [
+      '<div class="page-header">',
+      '  <div class="wrapper">',
+      '    <div class="page-header__body">',
+      '      <div class="page-header__inner flow">',
+      '        <h1 class="page-header__heading">Semiconductor Test</h1>',
+      '        <div class="page-header__summary flow flow-space-300">',
+      '          <p>We\'re paving the shortest path <strong>from lab to fab.</strong></p>',
+      '        </div>',
+      '        <a class="btn btn-primary flow-space-500" href="/about">Learn more</a>',
+      '      </div>',
+      '    </div>',
+      '  </div>',
+      '</div>',
+      '',
+      '<!-- Homepage variant: same structure, two-tone heading -->',
+      '<h1 class="homepage-header__heading">Semiconductor Test <span>and Measurement</span></h1>',
+    ].join('\n'),
   },
   {
-    slug: 'table', name: 'Table',
-    purpose: 'Dense tabular data with a header row and many records.',
-    whenToUse: 'Use for lists of records the user scans, sorts, or filters (manufacturers, employees, product series).',
-    match: (el) => el.tag === 'table',
+    slug: 'footer', name: 'Footer',
+    purpose: 'Site-wide footer: four link columns, corporate info, and a bottom-rounded top edge.',
+    whenToUse: 'Use on every page. The column count is driven by --footer-body-columns (3) with .col-one … .col-four in the markup.',
+    match: (el, cls) => hasClass(cls, 'site-footer'),
     variant: () => 'default',
+    notes: [
+      'Top corners are rounded (`0px 0px 30px 30px` observed on `div.footer`) so the footer reads as a panel lifting off the page bottom.',
+      '`--yellow` (#d2d755) appears here and essentially nowhere else — it is a footer-only accent on all 15 pages.',
+    ],
+    example: [
+      '<footer class="site-footer">',
+      '  <section class="site-footer__inner">',
+      '    <div class="site-footer__body">',
+      '      <div class="col col-one">  <!-- repeat col-two … col-four -->',
+      '        <h3>Products</h3>',
+      '        <ul><li><a href="/products/">Probe Cards</a></li></ul>',
+      '      </div>',
+      '    </div>',
+      '    <div class="site-footer__info"><p>&copy; FormFactor, Inc.</p></div>',
+      '  </section>',
+      '</footer>',
+    ].join('\n'),
   },
   {
-    slug: 'input', name: 'Input',
-    purpose: 'Text fields, selects, and textareas for data entry and search.',
-    whenToUse: 'Use for free-text entry, search boxes, and option selection in forms and filters.',
-    match: (el) => el.tag === 'input' || el.tag === 'textarea' || el.tag === 'select',
-    variant: (el) => el.tag,
+    slug: 'cta-band', name: 'CTA band',
+    purpose: 'A rounded, shadowed panel holding a centered heading and a grid of two or three calls to action.',
+    whenToUse: 'Use to close a page, or between content sections, when you want to offer the reader two or three next steps of equal weight.',
+    match: (el, cls) => hasClass(cls, 'cta-box'),
+    variant: () => 'default',
+    notes: [
+      'The panel itself carries the utility classes `radius shadow` — 30px radius plus the site\'s one real elevation (`rgba(0,0,0,0.2) 0 4px 15px`).',
+      'Two or three items per row via `ul.cta-grid`; each `li` uses `flow` for vertical rhythm.',
+    ],
+    example: [
+      '<section class="cta-box">',
+      '  <div class="wrapper">',
+      '    <div class="cta-box__content flow radius shadow">',
+      '      <div class="cta-box__heading flow center"><h2>Ready to talk?</h2></div>',
+      '      <div class="cta-box__body">',
+      '        <ul class="cta-grid">',
+      '          <li class="flow flow-space-600">',
+      '            <p>Talk to an applications engineer about your test challenge.</p>',
+      '            <a class="btn btn-primary" href="/contact">Contact sales</a>',
+      '          </li>',
+      '        </ul>',
+      '      </div>',
+      '    </div>',
+      '  </div>',
+      '</section>',
+    ].join('\n'),
   },
   {
-    slug: 'button', name: 'Button',
-    purpose: 'Clickable controls that trigger an action.',
-    whenToUse: 'Use for primary and secondary actions; reserve the brand-blue primary for the main action on a view.',
-    match: (el, cls) => el.tag === 'button' || hasAnyClass(cls, /(^|[-_])btn([-_]|$)/),
-    variant: (el) => bgVariant(el),
-  },
-  {
-    slug: 'nav-item', name: 'Nav item',
-    purpose: 'Links in the persistent top header / primary navigation bar.',
-    whenToUse: 'Use inside the header to move between top-level sections.',
-    // HEURISTIC (verify in P4): FormFactor uses a top nav bar, not a sidebar, so
-    // we bound by y rather than x. Retune against raw/home/screenshot.png.
-    match: (el) => el.tag === 'a' && el.rect.y < 160 && el.rect.h >= 18 && el.rect.h <= 80,
-    variant: (el) => (isBrand(normalizeColor(el.styles['color'] || '')) ? 'active' : 'default'),
-  },
-  {
-    slug: 'badge', name: 'Badge / chip',
-    purpose: 'Small rounded labels for status, counts, categories, and filter pills.',
-    whenToUse: 'Use for compact status indicators and filter chips — not for actions (use a Button) or long-form text.',
-    match: (el, cls) => {
-      const radius = radiusPx(el.styles['border-radius'] || '');
-      const roundedFull = hasAnyClass(cls, /rounded-full/) || (el.rect.h > 0 && radius >= el.rect.h / 2);
-      const bg = normalizeColor(el.styles['background-color'] || '');
-      const bw = pxOf(el.styles['border-top-width'] || '');
-      return roundedFull && el.rect.h <= 36 && el.rect.w <= 280 && (!!bg || (bw !== null && bw > 0));
-    },
-    variant: (el) => {
-      const bg = normalizeColor(el.styles['background-color'] || '');
-      if (!bg) return 'outline';
-      const o = toOklch(parse(bg)!);
-      return (o.c ?? 0) < 0.04 ? 'neutral' : bg;
-    },
+    slug: 'breadcrumb', name: 'Breadcrumb',
+    purpose: 'Ancestor trail above the page content, rendered by WooCommerce.',
+    whenToUse: 'Use on pages nested below a section index (products, categories, product detail). Absent on the homepage and top-level landing pages.',
+    match: (el, cls) => hasClass(cls, 'woocommerce-breadcrumb'),
+    variant: () => 'default',
+    notes: [
+      'Rendered by WooCommerce, so the markup is a flat `nav` with `/` separators rather than a list.',
+      'Absent on the homepage and on top-level landing pages — 11 of 15 templates.',
+    ],
+    example: [
+      '<nav class="woocommerce-breadcrumb">',
+      '  <a href="/">Home</a> / <a href="/products/">Products</a> / Probe Cards',
+      '</nav>',
+    ].join('\n'),
   },
   {
     slug: 'card', name: 'Card',
-    purpose: 'Surface containers that group related content behind a border or shadow.',
-    whenToUse: 'Use to group a coherent block of content or controls; prefer a single elevation level per view.',
-    match: (el) => {
-      if (el.tag !== 'div') return false;
+    purpose: 'Rounded surface grouping a heading, description, image and link — the workhorse of every index page.',
+    whenToUse: 'Use in a grid to present a set of peer items (product families, industries, posts, CTAs). Always 30px radius; never square.',
+    match: (el, cls) => {
+      if (!['article', 'li', 'div', 'section'].includes(el.tag)) return false;
+      if (hasAnyClass(cls, /card|featured-post/)) return true;
+      // Unnamed but visually a card: rounded surface of meaningful size.
       const radius = radiusPx(el.styles['border-radius'] || '');
-      const shadow = (el.styles['box-shadow'] || 'none') !== 'none';
-      const bw = pxOf(el.styles['border-top-width'] || '');
-      const padT = pxOf(el.styles['padding-top'] || '');
-      return (shadow || (bw !== null && bw > 0)) && radius >= 4 && el.rect.w >= 160 && el.rect.h >= 56 && padT !== null && padT > 0;
+      return radius >= 4 && isSurface(el) && el.rect.w >= 160 && el.rect.h >= 56;
     },
-    variant: (el) => ((el.styles['box-shadow'] || 'none') !== 'none' ? 'elevated' : 'bordered'),
+    variant: (el, cls) => {
+      for (const c of cls) if (/card|featured-post/.test(c) && !/__/.test(c)) return c;
+      return `${el.tag}-surface`;
+    },
+    notes: [
+      'Always 30px radius. There is no square-cornered card on this site.',
+      'The card is usually an `article` or `li`, not a `div` — 59 of the 115 rounded surfaces in the crawl are `article`.',
+      'One image treatment rounds only the top corners (`30px 30px 0px 0px`) so the image meets the card edge flush.',
+    ],
+    example: [
+      '<ul class="product-family-card__grid">',
+      '  <li>',
+      '    <article class="product-family-card radius shadow">',
+      '      <img src="https://placehold.co/600x400" alt="">',
+      '      <h2 class="product-family-card__heading">Apollo</h2>',
+      '      <p class="product-family-card__description">',
+      '        High-parallelism probe card for foundry and logic test.',
+      '      </p>',
+      '      <a class="btn btn-primary" href="/product/apollo/">View product</a>',
+      '    </article>',
+      '  </li>',
+      '</ul>',
+    ].join('\n'),
+  },
+  {
+    slug: 'tabs', name: 'Tabs',
+    purpose: 'Horizontal tab strip for switching between sibling views of the same page.',
+    whenToUse: 'Use to filter an archive by year, or to split product detail into panes. Two implementations exist — the theme\'s own year tabs and BB PowerPack\'s pp-tabs.',
+    match: (el, cls) => hasAnyClass(cls, /^(year-tab|tab-link|year-tray|pp-tabs?|pp-tab-)/),
+    variant: (el, cls) => (hasAnyClass(cls, /^pp-/) ? 'pp-tabs (page builder)' : 'year-tabs (theme)'),
+    notes: [
+      'Two independent implementations coexist: the theme\'s `year-tray`/`year-tab` (archive filtering) and BB PowerPack\'s `pp-tabs` (product detail panes). Prefer the theme\'s when building new pages.',
+      'The theme\'s year tab is an `h3` wrapping an `a.tab-link` — unusual markup, but it is what ships.',
+    ],
+    example: [
+      '<div class="year-tray">',
+      '  <h3 class="year-tab"><a class="tab-link active" href="?y=2026">2026</a></h3>',
+      '  <h3 class="year-tab"><a class="tab-link" href="?y=2025">2025</a></h3>',
+      '</div>',
+    ].join('\n'),
+  },
+  {
+    slug: 'form-field', name: 'Form field',
+    purpose: 'Labelled input, select or textarea inside a Formidable form.',
+    whenToUse: 'Use for all data entry. Note the radius exception: form controls are 20px, not the site-wide 30px.',
+    match: (el, cls) => ['input', 'select', 'textarea'].includes(el.tag) || hasAnyClass(cls, /^(frm_primary_label|form-field)$/),
+    variant: (el) => (el.tag === 'div' ? 'label' : el.tag),
+    notes: [
+      '**Radius exception:** form controls are 20px, not the site-wide 30px. This is the only deliberate deviation in the geometry.',
+      'Markup comes from Formidable Forms, so class names are `frm_*`. They are real content, not vendor chrome.',
+    ],
+    example: [
+      '<div class="frm_form_field form-field frm_top_container">',
+      '  <label class="frm_primary_label" for="field_email">Work email</label>',
+      '  <input type="email" id="field_email" name="item_meta[3]">',
+      '</div>',
+      '<input type="submit" class="frm_final_submit btn btn-primary" value="Submit">',
+    ].join('\n'),
+  },
+  {
+    slug: 'table', name: 'Table',
+    purpose: 'Tabular data with a header row.',
+    whenToUse: 'Use only for genuinely tabular data. Barely used on this site — see the honest-gaps note in the report.',
+    match: (el) => el.tag === 'table',
+    variant: () => 'default',
+    notes: [
+      'Only **one** table exists across all 15 crawled templates, so there is no house table style to speak of. Treat this as an unproven component and see the honest-gaps section of the README.',
+    ],
+  },
+  {
+    slug: 'button', name: 'Button',
+    purpose: 'Pill-shaped action control. Navy fill by default, white fill on dark backgrounds.',
+    whenToUse: 'Use for actions and primary navigation moments. The 30px radius on a 40px-tall control makes it a full pill — that is the brand read, do not square it.',
+    // `skip-link` carries a `button` class but is an accessibility bypass link,
+    // not a button: 17.6px, no radius, visually hidden until focused.
+    match: (el, cls) => !hasClass(cls, 'skip-link') && (el.tag === 'button' || hasAnyClass(cls, /^(btn|button)(-|$)/)),
+    variant: (el, cls) => {
+      if (hasAnyClass(cls, /^contact-us-button/)) return 'edge-tab';
+      if (hasAnyClass(cls, /button-light/)) return 'light';
+      if (hasAnyClass(cls, /btn-inline/)) return 'inline (card wrapper)';
+      return bgVariant(el);
+    },
+    notes: [
+      '30px radius on a 40px-tall control is a full pill. Do not square it — this is the most recognisable geometry on the site.',
+      'Label is 16px, padding `8px 20px`. Weight is 700 in 39 of 46 observed `btn-primary` instances; the 7 at weight 400 sit inside prose blocks and inherit it, which looks unintentional.',
+      '`contact-us-button` is a distinctive persistent edge tab, present on every page: `position: fixed; right: 0; top: 25%; z-index: 9`, rotated `-90deg` so the label reads bottom-to-top, with its bottom corners squared (`border-bottom-*-radius: 0`) so the pill appears fused to the viewport edge. A separate `.contact-us-button-mobile` handles small screens.',
+      '`btn-inline` is not a button at all — it is a card-sized wrapper anchor (421×328) that inherits the browser default blue. Do not copy it.',
+      'The site also ships a visually-hidden `a.skip-link.button` for keyboard users (17.6px, no radius). It is excluded from the counts here because it is not a button.',
+    ],
+    example: [
+      '<a class="btn btn-primary" href="/contact">Contact sales</a>',
+      '<a class="btn btn-light" href="/learn">Learn more</a>       <!-- on dark bands -->',
+      '<button class="button button-light">Back</button>           <!-- in mega-menu -->',
+    ].join('\n'),
+  },
+  {
+    slug: 'nav-item', name: 'Nav item',
+    purpose: 'Link in the fixed site header — top-level mega-menu entries and their dropdown children.',
+    whenToUse: 'Use inside the header to move between top-level sections. Uppercase, letterspaced, weight 600 at top level.',
+    // Bounded by DOM ancestry, not geometry — the real links are h=16 and any
+    // height threshold excludes them. See the note above COMPONENT_DEFS.
+    match: (el) => el.tag === 'a' && /site-header|mega-menu/.test(el.path),
+    variant: (el, cls) => {
+      if (hasAnyClass(cls, /site-header__logo/)) return 'logo';
+      if (hasAnyClass(cls, /menu-item/)) return 'top-level';
+      return 'dropdown';
+    },
+    notes: [
+      'Top-level links are 12px uppercase, letterspaced, weight 600, navy `--primary`, and their box is only **16px tall** — do not gate on height when detecting them.',
+      'The header is `position: fixed; z-index: 6` at 92px tall, and does not appear in Chromium full-page screenshots. Use `screenshot-viewport.png` to see it.',
+      'The logo is a 340px-wide inline SVG wrapped in an anchor that has no color declared.',
+    ],
+    example: [
+      '<header class="site-header">',
+      '  <div class="wrapper">',
+      '    <div class="site-header__inner">',
+      '      <a class="site-header__logo" href="/"><!-- 340px inline SVG --></a>',
+      '      <nav id="mega-menu">',
+      '        <div class="top-level">',
+      '          <a class="menu-item" href="/products/">Products</a>',
+      '          <a class="menu-item" href="/applications/">Applications</a>',
+      '        </div>',
+      '      </nav>',
+      '    </div>',
+      '  </div>',
+      '</header>',
+    ].join('\n'),
+  },
+  {
+    slug: 'heading', name: 'Heading',
+    purpose: 'Section and page titles. Teal at every level — this is the single strongest brand rule on the site.',
+    whenToUse: 'Choose the level to match the document outline, never for visual size alone. Do not recolor: h1–h4 are teal --secondary in every template observed.',
+    match: (el) => /^h[1-6]$/.test(el.tag),
+    variant: (el) => el.tag.toLowerCase(),
+    notes: [
+      '**All heading levels are teal `--secondary` (#00a0af), not navy.** Observed: h1 67.2px, h2 45.3px, h3 30.0px, h4 24.7px — every one teal, weight 400.',
+      'Only h1 (67.2px = `--size-900`) maps cleanly onto the authored `--size-*` scale; h2/h3/h4 do not.',
+      'Weight is 400, not bold. The size carries the hierarchy, not the weight.',
+    ],
+    example: [
+      '<h1 class="page-header__heading">Page title</h1>   <!-- 67.2px teal -->',
+      '<h2>Section heading</h2>                            <!-- 45.3px teal -->',
+      '<h3 class="font-base">Subsection</h3>               <!-- 30.0px teal -->',
+    ].join('\n'),
   },
   {
     slug: 'link', name: 'Link',
-    purpose: 'Inline and list text links rendered in a brand color.',
+    purpose: 'Inline and list text links. Navy on light surfaces, white on dark ones.',
     whenToUse: 'Use for navigation within body content; use a Button for actions.',
-    match: (el) => el.tag === 'a' && isBrand(normalizeColor(el.styles['color'] || '')),
-    variant: () => 'default',
+    match: (el) => el.tag === 'a',
+    variant: (el) => {
+      const c = normalizeColor(el.styles['color'] || '');
+      if (!c) return 'unstyled';
+      if (isBrand(c)) return 'default (navy)';
+      if (c === '#ffffff') return 'inverse (on dark)';
+      if (UA_DEFAULT_HEXES.has(c)) return 'unstyled (UA default)';
+      return c;
+    },
+    notes: [
+      'Navy `--primary` on light surfaces (955 instances), white on dark ones (445). Both are legitimate; pick by background.',
+      '44 anchors inherit the browser default `#0000ee`. Every one is a *wrapper* anchor around an image or a whole card, so the blue never paints visible text — but do not imitate the pattern.',
+    ],
+    example: [
+      '<a href="/technologies/">Contact intelligence</a>     <!-- navy on light -->',
+      '<div class="dark-band"><a href="/company/">About us</a></div>  <!-- white on dark -->',
+    ].join('\n'),
   },
 ];
 
@@ -1306,6 +1571,9 @@ function collectComponents(pages: PageRaw[]): Map<string, CompAgg> {
   for (const page of pages) {
     for (const el of page.elements) {
       const cls = classSet(el);
+      // Pseudo-elements carry color and geometry but are not components — a
+      // `.page-header__body::after` is a 4px orange rule, not a Card.
+      if (el.pseudo) continue;
       for (const def of COMPONENT_DEFS) {
         if (!def.match(el, cls)) continue;
         const agg = aggs.get(def.slug)!;
@@ -1316,7 +1584,7 @@ function collectComponents(pages: PageRaw[]): Map<string, CompAgg> {
         v.count++; v.pages.add(page.slug);
         const ckey = el.classes || `(${el.tag}, no class)`;
         let cc = v.byClasses.get(ckey);
-        if (!cc) { cc = { count: 0, page: page.slug, rect: el.rect, styles: el.styles }; v.byClasses.set(ckey, cc); }
+        if (!cc) { cc = { count: 0, page: page.slug, path: el.path, rect: el.rect, styles: el.styles }; v.byClasses.set(ckey, cc); }
         cc.count++;
         break; // first match wins
       }
@@ -1331,9 +1599,29 @@ function tokenRef(hex: string | null, colorToToken: Map<string, string>): string
   return name ? `\`${hex}\` (\`${name}\`)` : `\`${hex}\``;
 }
 
+/** Desktop crawl width — used only to spot elements parked off-canvas. */
+const VIEWPORT_W = 1440;
+
+/**
+ * Pick the most representative instance of a variant.
+ *
+ * Naively taking the highest-count class string picks badly: the site's
+ * most-repeated `btn btn-primary` is `search-close`, a collapsed search control
+ * parked at x=1510 — off-canvas, invisible, and 0px radius because it is hidden.
+ * So on-canvas instances are strongly preferred, and among those the one with the
+ * largest painted area wins ties, since that is what a reader actually sees.
+ */
 function topClassesOf(v: VariantAgg): [string, VariantAgg['byClasses'] extends Map<string, infer T> ? T : never] | null {
-  const sorted = [...v.byClasses.entries()].sort((a, b) => b[1].count - a[1].count);
-  return sorted[0] ?? null;
+  const entries = [...v.byClasses.entries()];
+  const onCanvas = (e: typeof entries[number]): boolean => {
+    const r = e[1].rect;
+    return r.x >= 0 && r.x < VIEWPORT_W && r.y >= 0 && r.w > 0 && r.h > 0;
+  };
+  const pool = entries.filter(onCanvas);
+  const ranked = (pool.length ? pool : entries).sort((a, b) =>
+    b[1].count - a[1].count ||
+    (b[1].rect.w * b[1].rect.h) - (a[1].rect.w * a[1].rect.h));
+  return ranked[0] ?? null;
 }
 
 function buildComponentMdx(def: ComponentDef, agg: CompAgg, colorToToken: Map<string, string>): string | null {
@@ -1367,12 +1655,29 @@ function buildComponentMdx(def: ComponentDef, agg: CompAgg, colorToToken: Map<st
   }
   lines.push('');
 
+  if (def.notes?.length) {
+    lines.push('## Rules and gotchas', '');
+    for (const n of def.notes) lines.push(`- ${n}`);
+    lines.push('');
+  }
+
+  if (def.example) {
+    lines.push('## Canonical markup', '');
+    lines.push('Real theme class names, so a prototype inherits the theme CSS. Imagery is a placeholder — FormFactor\'s own photography and logos are never redistributed from this repo.', '');
+    lines.push('```html', def.example, '```', '');
+  }
+
   const canonical = topClassesOf(variants[0]![1]);
   if (canonical) {
     const [classes, ex] = canonical;
     const s = ex.styles;
-    lines.push('## Canonical example', '');
-    lines.push(`- **Screenshot:** \`raw/${ex.page}/screenshot.png\` — region x:${ex.rect.x} y:${ex.rect.y} w:${ex.rect.w} h:${ex.rect.h}`);
+    lines.push('## Observed instance', '');
+    lines.push(`The most representative on-canvas instance, for cross-checking against the screenshots.`, '');
+    // The fixed header is missing from Chromium's full-page capture, so point at
+    // the viewport shot for anything living in it.
+    const shot = /site-header|mega-menu/.test(ex.path ?? '') || ex.rect.y < 92
+      ? 'screenshot-viewport.png' : 'screenshot.png';
+    lines.push(`- **Screenshot:** \`raw/${ex.page}/${shot}\` — region x:${ex.rect.x} y:${ex.rect.y} w:${ex.rect.w} h:${ex.rect.h}`);
     lines.push(`- **Classes:** \`${classes}\``);
     lines.push(`- **Key styles:** color ${s['color'] ?? '—'}; background ${s['background-color'] ?? '—'}; font ${s['font-size'] ?? '—'}/${s['font-weight'] ?? '—'}; padding ${s['padding-top'] ?? '—'} ${s['padding-right'] ?? '—'} ${s['padding-bottom'] ?? '—'} ${s['padding-left'] ?? '—'}; radius ${s['border-radius'] ?? '—'}`);
     lines.push('');
@@ -1392,7 +1697,8 @@ async function writeComponents(pages: PageRaw[], colorToToken: Map<string, strin
 
   const index: string[] = [
     '# FormFactor components', '',
-    'Derived from computed styles + screenshots (P4). Each component is detected by tag + Tailwind classes + computed styles — not by the unstable `phx-*` ids. Colors are cross-linked to the tokens in `../tokens/color.json`.', '',
+    'Derived from the computed styles and screenshots of ' + pages.length + ' page templates on www.formfactor.com.', '',
+    'Each component is detected from the `formfactor-2022` theme\'s own BEM-ish class names plus computed styles and geometry. Colors cross-link to `../tokens/color.json`, where tokens carry FormFactor\'s authored names (`primary`, `secondary`) rather than generated ones.', '',
     '| Component | Instances | Variants | Pages |', '|---|---:|---:|---:|',
   ];
   for (const def of COMPONENT_DEFS) {
@@ -1403,6 +1709,16 @@ async function writeComponents(pages: PageRaw[], colorToToken: Map<string, strin
     written.push(def.slug);
     index.push(`| [${def.name}](${def.slug}.mdx) | ${agg.count} | ${agg.variants.size} | ${agg.pages.size} |`);
   }
+  // Honest gaps. Two components this site was expected to have simply are not
+  // there in the crawled templates, and saying so is more useful than inventing
+  // a plausible-looking MDX for them.
+  index.push('');
+  index.push('## Honest gaps', '');
+  index.push('- **No pull quote.** There are zero `<blockquote>` elements across all ' + pages.length + ' templates, including the long-form blog post. If a prototype needs one, it is being invented, not reproduced.');
+  index.push('- **No spec table worth the name.** Exactly one `<table>` exists in the whole crawl (5 `<th>`, 20 `<td>`, on one industry page). The product detail page has no spec table at all, so there is no house table style to copy. `table.mdx` documents the single instance and should be treated as unproven.');
+  index.push('- **Mega-menu dropdowns are captured but not exercised.** The `nav#mega-menu` panel is 740×395 and its contents are in the DOM, but the crawl never hovers it open, so the dropdown variant\'s rendered state is inferred from computed styles rather than seen.');
+  index.push('- **Hover/focus states live in `raw/<page>/states.json`**, captured via CDP `forcePseudoState`, and are not yet folded into these files.');
+  index.push('');
   await fs.writeFile(path.join(COMPONENTS_DIR, 'README.md'), index.join('\n') + '\n');
   return { written, skipped };
 }
@@ -1430,8 +1746,8 @@ async function main(): Promise<void> {
   console.log(`  authored :root colors — ${authored.length} (${authored.map((a) => a.name).join(', ')})`);
 
   // Colors
-  const { stats: colorStats, tally: colorTally, uaDefaults, socialOnly } = collectColors(pages);
-  const { clusters, tail } = clusterColors(colorStats, colorTally, authored, socialOnly);
+  const { stats: colorStats, tally: colorTally, uaDefaults, socialOnly, pseudoOnly } = collectColors(pages);
+  const { clusters, tail } = clusterColors(colorStats, colorTally, authored, socialOnly, pseudoOnly);
   await writeJson('color.json', buildColorTokens(clusters, nPages));
   const namedCount = clusters.filter((c) => c.authored).length;
   console.log(`  color.json     — ${clusters.length} tokens from ${colorStats.size} distinct colors (${namedCount} carry authored names)`);

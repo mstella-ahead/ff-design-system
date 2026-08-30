@@ -1,0 +1,67 @@
+---
+name: Form field
+component: form-field
+instances: 72
+variants: 4
+pages: [applications-case-studies, blog, blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever, company-about-us, company-careers-career-opportunities, company-news-events-press-releases, events, home, industries-automotive, press-release-formfactor-introduces-the-evolvity-300-probe-system, product-probe-cards-foundry-logic-apollo, products, products-probe-cards, sales-service-contact-sales, technologies-contact-intelligence]
+---
+
+# Form field
+
+Labelled input, select or textarea inside a Formidable form.
+
+**When to use:** Use for all data entry. Note the radius exception: form controls are 20px, not the site-wide 30px.
+
+Observed **72** time(s) across **15** page(s).
+
+## Variants
+
+| Variant | Background | Text | Radius | Count | Pages | Example classes |
+|---|---|---|---|---:|---:|---|
+| `label` | — | `#003a63` (`primary`) | 0px | 38 | 1 | `frm_primary_label` |
+| `input` | — | `#00a0af` (`secondary`) | 20px | 30 | 15 | `(input, no class)` |
+| `select` | — | `#555555` (`neutral-700`) | 20px | 3 | 1 | `(select, no class)` |
+| `textarea` | `#ffffff` (`light`) | `#555555` (`neutral-700`) | 20px | 1 | 1 | `(textarea, no class)` |
+
+## Rules and gotchas
+
+- **Radius exception:** form controls are 20px, not the site-wide 30px. This is the only deliberate deviation in the geometry.
+- Markup comes from Formidable Forms, so class names are `frm_*`. They are real content, not vendor chrome.
+
+## Canonical markup
+
+Real theme class names, so a prototype inherits the theme CSS. Imagery is a placeholder — FormFactor's own photography and logos are never redistributed from this repo.
+
+```html
+<div class="frm_form_field form-field frm_top_container">
+  <label class="frm_primary_label" for="field_email">Work email</label>
+  <input type="email" id="field_email" name="item_meta[3]">
+</div>
+<input type="submit" class="frm_final_submit btn btn-primary" value="Submit">
+```
+
+## Observed instance
+
+The most representative on-canvas instance, for cross-checking against the screenshots.
+
+- **Screenshot:** `raw/sales-service-contact-sales/screenshot.png` — region x:85 y:706 w:622 h:37
+- **Classes:** `frm_primary_label`
+- **Key styles:** color rgb(0, 58, 99); background rgba(0, 0, 0, 0); font 17.92px/700; padding 0px 0px 10px 0px; radius 0px
+
+## Source pages
+
+- `raw/applications-case-studies/`
+- `raw/blog/`
+- `raw/blog-2026-why-semiconductor-test-infrastructure-matters-more-than-ever/`
+- `raw/company-about-us/`
+- `raw/company-careers-career-opportunities/`
+- `raw/company-news-events-press-releases/`
+- `raw/events/`
+- `raw/home/`
+- `raw/industries-automotive/`
+- `raw/press-release-formfactor-introduces-the-evolvity-300-probe-system/`
+- `raw/product-probe-cards-foundry-logic-apollo/`
+- `raw/products/`
+- `raw/products-probe-cards/`
+- `raw/sales-service-contact-sales/`
+- `raw/technologies-contact-intelligence/`
