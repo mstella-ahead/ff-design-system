@@ -1,0 +1,12 @@
+# Scraped page content — never commit the scrape. It's someone else's copy,
+# markup and photography; this repo ships the distilled system, not the source.
+raw/
+raw-mobile/
+
+# Dependencies + build output.
+node_modules/
+dist/
+
+# OS / editor noise.
+.DS_Store
+*.log

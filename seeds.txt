@@ -1,0 +1,52 @@
+# seeds.txt — the curated page list for the FormFactor crawl.
+#
+# One URL per line. Lines starting with '#' and blank lines are ignored.
+# The goal is ONE representative page per archetype, not an exhaustive crawl —
+# a design system needs one of each kind of page, not hundreds of near-duplicates.
+# www.formfactor.com has ~1,130 HTML URLs in its sitemap; 400+ are press releases
+# and 400+ are blog posts, all sharing two templates. Crawling them all would just
+# oversample two layouts.
+#
+# Every URL below was verified to return HTTP 200 (no redirect) on 2026-08-30.
+# If you add one, check it first — /news-events/press-releases/ for example 301s
+# to /company/news-events/press-releases/, which is the canonical form used here.
+
+#   home / landing — hero, headings, CTAs, brand color at full strength
+https://www.formfactor.com/
+
+#   product index + category listing — card grids, filters, taxonomy nav
+https://www.formfactor.com/products/
+https://www.formfactor.com/products/probe-cards/
+
+#   product detail — spec tables, feature blocks, downloads, related products
+https://www.formfactor.com/product/probe-cards/foundry-logic/apollo/
+
+#   solution / industry detail — narrative marketing page, mixed media blocks
+https://www.formfactor.com/industries/automotive/
+https://www.formfactor.com/technologies/contact-intelligence/
+
+#   applications / case studies — proof-point tiles, logos, outcome stats
+https://www.formfactor.com/applications/case-studies/
+
+#   blog index — paginated listing, cards, categories, sidebar
+https://www.formfactor.com/blog/
+
+#   blog post — long-form article body: prose, headings, pull quotes, figures
+https://www.formfactor.com/blog/2026/why-semiconductor-test-infrastructure-matters-more-than-ever/
+
+#   press release index + detail — dense IR/news typography, dateline, boilerplate
+https://www.formfactor.com/company/news-events/press-releases/
+https://www.formfactor.com/press-release/formfactor-introduces-the-evolvity-300-probe-system/
+
+#   company / about — leadership, values, editorial imagery
+https://www.formfactor.com/company/about-us/
+
+#   form / contact — inputs, labels, selects, validation, submit buttons
+#   (this is the archetype the Unity build under-covered — don't drop it)
+https://www.formfactor.com/sales-service/contact-sales/
+
+#   events listing — date-stamped cards, empty/past states
+https://www.formfactor.com/events/
+
+#   careers — a distinct template, often the one that drifts furthest off-brand
+https://www.formfactor.com/company/careers/career-opportunities/
